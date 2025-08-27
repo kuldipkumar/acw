@@ -1,0 +1,89 @@
+import React from 'react';
+import Slider from 'react-slick';
+import { NavLink } from 'react-router-dom';
+import './CakeCarousel.css';
+import 'slick-carousel/slick/slick.css';
+import 'slick-carousel/slick/slick-theme.css';
+
+const CakeCarousel = () => {
+  const [cakes, setCakes] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState(null);
+
+  React.useEffect(() => {
+    const fetchCakes = async () => {
+      try {
+        // IMPORTANT: Replace this with your actual API Gateway endpoint URL
+        const response = await fetch('https://zde429pfbi.execute-api.ap-south-1.amazonaws.com/default/getCakesFromS3');
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        setCakes(data);
+      } catch (e) {
+        setError(e.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCakes();
+  }, []);
+
+  const settings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 3,
+    slidesToScroll: 1,
+    centerMode: true,
+    autoplay: true,
+    autoplaySpeed: 3000,
+    arrows: true,
+    responsive: [
+      { breakpoint: 1200, settings: { slidesToShow: 2 } },
+      { breakpoint: 768, settings: { slidesToShow: 1 } },
+    ],
+  };
+
+  if (loading) {
+    return <section className="carousel-section"><p>Loading cakes...</p></section>;
+  }
+
+  if (error) {
+    return <section className="carousel-section"><p>Error loading cakes: {error}</p></section>;
+  }
+
+  return (
+    <section className="carousel-section">
+      <div className="section-header">
+        <h2 className="section-title">Cravings for Every Celebration</h2>
+        <p className="section-subtitle">Discover our handcrafted cakes, made with love and the finest ingredients.</p>
+      </div>
+      <div className="carousel-container">
+        {cakes.length > 0 ? (
+          <Slider {...settings}>
+            {cakes.map(cake => (
+              <div key={cake.id} className="cake-slide">
+                <div className="cake-card">
+                  <img src={cake.src} alt={cake.alt} className="cake-image" />
+                  <div className="cake-info">
+                    <h3 className="cake-name">{cake.name}</h3>
+                    <p className="cake-description">{cake.description}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </Slider>
+        ) : (
+          <p>No cakes to display at the moment.</p>
+        )}
+      </div>
+      <div className="section-footer">
+        <NavLink to="/gallery" className="view-all-btn">View All Creations</NavLink>
+      </div>
+    </section>
+  );
+};
+
+export default CakeCarousel;

@@ -1,0 +1,163 @@
+.carousel-section {
+  padding: 5rem 0;
+  background-color: var(--secondary-color);
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  padding: 0 2rem;
+}
+
+.section-title {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.section-subtitle {
+  font-size: 1.2rem;
+  max-width: 600px;
+  margin: 0 auto;
+  color: var(--primary-color-light);
+}
+
+.carousel-container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.cake-slide {
+  padding: 0 1rem;
+  outline: none;
+}
+
+.cake-card {
+  background: var(--background-color);
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.cake-image {
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+}
+
+.cake-info {
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.cake-name {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.cake-description {
+  font-size: 1rem;
+  color: var(--primary-color-light);
+}
+
+.slick-center .cake-card {
+  transform: scale(1.05);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+}
+
+.slick-dots li button:before {
+  font-size: 12px;
+  color: var(--primary-color);
+  opacity: 0.4;
+}
+
+.slick-dots li.slick-active button:before {
+  color: var(--accent-color);
+  opacity: 1;
+}
+
+.section-footer {
+  text-align: center;
+  margin-top: 3rem;
+}
+
+.view-all-btn {
+  background-color: transparent;
+  color: var(--accent-color);
+  border: 2px solid var(--accent-color);
+  padding: 0.8rem 2.5rem;
+  border-radius: 50px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.view-all-btn:hover {
+  background-color: var(--accent-color);
+  color: white;
+}
+
+/* --- Carousel Arrow Styling --- */
+.slick-prev,
+.slick-next {
+  font-size: 0; /* Hide default text */
+  line-height: 0;
+  position: absolute;
+  top: 50%;
+  display: block;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  transform: translate(0, -50%);
+  cursor: pointer;
+  color: transparent;
+  border: none;
+  outline: none;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.slick-prev:hover,
+.slick-next:hover {
+  background: white;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.slick-prev:before,
+.slick-next:before {
+  font-family: 'slick';
+  font-size: 20px;
+  line-height: 1;
+  opacity: 0.75;
+  color: var(--primary-color);
+}
+
+.slick-prev {
+  left: -20px;
+}
+
+.slick-next {
+  right: -20px;
+}
+
+.slick-prev:before {
+  content: '←';
+}
+
+.slick-next:before {
+  content: '→';
+}
+
+/* Hide arrows on smaller screens */
+@media (max-width: 768px) {
+  .slick-prev,
+  .slick-next {
+    display: none !important;
+  }
+}

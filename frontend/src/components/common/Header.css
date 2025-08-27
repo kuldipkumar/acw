@@ -1,0 +1,92 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 5%;
+  background-color: var(--background-color);
+  border-bottom: 1px solid #eee;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.logo-container {
+  flex: 1;
+}
+
+.logo {
+  height: 80px;
+}
+
+.main-nav {
+  flex: 2;
+  text-align: center;
+}
+
+.main-nav ul {
+  list-style: none;
+  display: inline-flex;
+  margin: 0;
+  padding: 0;
+  gap: 3rem;
+}
+
+.main-nav ul li a {
+  text-decoration: none;
+  color: var(--primary-color);
+  font-weight: 600;
+  font-size: 1.2rem;
+  position: relative;
+  padding-bottom: 5px;
+}
+
+.main-nav ul li a::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: var(--accent-color);
+  transition: width 0.3s ease;
+}
+
+.main-nav ul li a.active::after,
+.main-nav ul li a:hover::after {
+  width: 100%;
+}
+
+.header-actions {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.social-icons {
+  display: flex;
+  gap: 1rem;
+}
+
+.social-icons a {
+  color: var(--primary-color);
+  font-size: 1.3rem;
+}
+
+.shop-now-btn {
+  background-color: var(--accent-color);
+  color: white;
+  border: none;
+  padding: 0.8rem 2rem;
+  border-radius: 50px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.shop-now-btn:hover {
+  background-color: var(--accent-hover-color);
+  transform: translateY(-2px);
+}

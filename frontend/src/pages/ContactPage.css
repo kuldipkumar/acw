@@ -1,0 +1,70 @@
+.contact-page {
+  padding: 4rem 2rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.page-title {
+  text-align: center;
+  font-size: 3rem;
+  margin-bottom: 3rem;
+  font-family: 'Cursive', sans-serif;
+  color: var(--primary-color);
+}
+
+.contact-container {
+  display: flex;
+  gap: 3rem;
+  background-color: #fff;
+  padding: 2rem;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.contact-info, .contact-form-section {
+  flex: 1;
+}
+
+.contact-info h3 {
+  font-size: 1.8rem;
+  color: var(--primary-color);
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid var(--accent-color);
+  padding-bottom: 0.5rem;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  font-size: 1.1rem;
+}
+
+.info-item i {
+  font-size: 1.5rem;
+  color: var(--accent-color);
+  margin-right: 15px;
+  width: 30px; /* Align icons */
+}
+
+.social-links-contact {
+  margin-top: 2rem;
+}
+
+.social-links-contact a {
+  color: #333;
+  font-size: 2rem;
+  margin-right: 20px;
+  transition: color 0.3s ease;
+}
+
+.social-links-contact a:hover {
+  color: var(--accent-color);
+}
+
+/* Simple placeholder for a form idea */
+.contact-form-section p {
+  font-size: 1.1rem;
+  color: #555;
+  line-height: 1.8;
+}
