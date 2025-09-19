@@ -1,9 +1,10 @@
 import React from 'react';
 import Slider from 'react-slick';
 import { NavLink } from 'react-router-dom';
-import './CakeCarousel.css';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
+import './CakeCarousel.css';
+import { NextArrow, PrevArrow } from './CustomArrows';
 
 const CakeCarousel = () => {
   const [cakes, setCakes] = React.useState([]);
@@ -13,15 +14,16 @@ const CakeCarousel = () => {
   React.useEffect(() => {
     const fetchCakes = async () => {
       try {
-        // IMPORTANT: Replace this with your actual API Gateway endpoint URL
-        const response = await fetch('https://zde429pfbi.execute-api.ap-south-1.amazonaws.com/default/getCakesFromS3');
+        // Use local backend during development; CRA proxy will route /api to backend
+        const response = await fetch('/api/cakes');
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
         setCakes(data);
       } catch (e) {
-        setError(e.message);
+        console.error('Failed to fetch cakes:', e);
+        setError(e.message || 'Failed to fetch');
       } finally {
         setLoading(false);
       }
@@ -40,6 +42,8 @@ const CakeCarousel = () => {
     autoplay: true,
     autoplaySpeed: 3000,
     arrows: true,
+    nextArrow: <NextArrow />,
+    prevArrow: <PrevArrow />,
     responsive: [
       { breakpoint: 1200, settings: { slidesToShow: 2 } },
       { breakpoint: 768, settings: { slidesToShow: 1 } },

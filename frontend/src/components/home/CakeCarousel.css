@@ -96,11 +96,40 @@
 }
 
 .view-all-btn:hover {
-  background-color: var(--accent-color);
+  background-color: #e685b5;
   color: white;
 }
 
 /* --- Carousel Arrow Styling --- */
+.custom-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1;
+  cursor: pointer;
+  font-size: 2rem; /* Adjust size as needed */
+  color: #333; /* Arrow color */
+}
+
+.next-arrow {
+  right: -35px; /* Position outside the carousel */
+}
+
+.prev-arrow {
+  left: -35px; /* Position outside the carousel */
+}
+
+.slick-prev::before,
+.slick-next::before {
+  font-family: 'slick';
+  font-size: 32px;
+  line-height: 1;
+  opacity: 1;
+  color: #fff;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 .slick-prev,
 .slick-next {
   font-size: 0; /* Hide default text */
@@ -108,42 +137,49 @@
   position: absolute;
   top: 50%;
   display: block;
-  width: 44px;
-  height: 44px;
+  width: 60px;
+  height: 60px;
   padding: 0;
   transform: translate(0, -50%);
   cursor: pointer;
   color: transparent;
   border: none;
   outline: none;
-  background: rgba(255, 255, 255, 0.8);
-  border-radius: 50%;
-  z-index: 10;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background: transparent; /* remove circle */
+  border-radius: 0;
+  z-index: 100;
+  box-shadow: none; /* remove elevation */
   transition: all 0.3s ease;
 }
 
 .slick-prev:hover,
 .slick-next:hover {
-  background: white;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  background: transparent; /* no background on hover */
+  box-shadow: none;
 }
 
 .slick-prev:before,
 .slick-next:before {
   font-family: 'slick';
-  font-size: 20px;
+  font-size: 36px; /* slightly larger icon since circle removed */
   line-height: 1;
-  opacity: 0.75;
-  color: var(--primary-color);
+  opacity: 1;
+  color: var(--accent-color); /* elegant theme color for visibility */
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.35); /* improve contrast over images */
+}
+
+/* Hover: subtly darken arrow color for feedback */
+.slick-prev:hover:before,
+.slick-next:hover:before {
+  color: #d76aa5;
 }
 
 .slick-prev {
-  left: -20px;
+  left: 10px;
 }
 
 .slick-next {
-  right: -20px;
+  right: 10px;
 }
 
 .slick-prev:before {

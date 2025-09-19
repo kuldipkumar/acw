@@ -1,15 +1,16 @@
-// Import the S3 client and commands from AWS SDK v3
-import { S3Client, ListObjectsV2Command, HeadObjectCommand } from '@aws-sdk/client-s3';
+// Import the S3 client and commands from AWS SDK v3 (CommonJS)
+const { S3Client, ListObjectsV2Command, HeadObjectCommand, GetObjectCommand } = require('@aws-sdk/client-s3');
+const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
 
 // --- Configuration ---
-const BUCKET_NAME = 'cakewalkbucket2'; // Your S3 bucket name
-const REGION = 'ap-south-1'; // Your S3 bucket region
+const BUCKET_NAME = process.env.S3_BUCKET_NAME || 'cakewalkbucket2'; // Prefer env var
+const REGION = process.env.AWS_REGION || 'ap-south-1'; // Prefer env var
 
 // Create an S3 client
 const s3Client = new S3Client({ region: REGION });
 
-export const handler = async (event) => {
-  const bucketUrl = `https://${BUCKET_NAME}.s3.${REGION}.amazonaws.com`;
+exports.handler = async (event) => {
+  // Note: We will generate pre-signed URLs instead of using the public bucket URL
 
   try {
     // 1. List all objects in the S3 bucket
@@ -24,20 +25,27 @@ export const handler = async (event) => {
       };
     }
 
-    // 2. For each object, get its metadata
+    // 2. For each object, get its metadata and a pre-signed URL
     const cakeDataPromises = listObjectsResult.Contents.map(async (item) => {
       const headObjectParams = { Bucket: BUCKET_NAME, Key: item.Key };
       const headObjectResult = await s3Client.send(new HeadObjectCommand(headObjectParams));
 
       const metadata = headObjectResult.Metadata;
 
-      // 3. Construct the cake object
+      // Generate a pre-signed URL for private object access (default 1 hour)
+      const signedUrl = await getSignedUrl(
+        s3Client,
+        new GetObjectCommand({ Bucket: BUCKET_NAME, Key: item.Key }),
+        { expiresIn: 3600 }
+      );
+
+      // 3. Construct the cake object with a pre-signed URL
       return {
         id: item.Key, // Use the file key as a unique ID
         name: metadata.name || 'Unnamed Cake',
         description: metadata.description || '',
         alt: metadata.alt || 'A beautiful cake',
-        src: `${bucketUrl}/${item.Key}`,
+        src: signedUrl,
       };
     });
 
