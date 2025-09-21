@@ -169,3 +169,4 @@ jobs:
 - CORS errors: verify API Gateway CORS is enabled for your exact site origin; ensure Lambda responses include `Access-Control-Allow-Origin`.
 - Uploads failing: ensure API Gateway passes binary bodies, and do not set `Content-Type` manually when using `FormData` on the frontend.
 - S3 AccessDenied: check Lambda role policies and bucket name/region.
+# Triggering a fresh workflow run
