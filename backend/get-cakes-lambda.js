@@ -43,11 +43,7 @@ exports.handler = async (event) => {
     console.log('Generating pre-signed URLs for each object...');
     const cakeDataPromises = listObjectsResult.Contents.map(async (item) => {
       console.log(`- Generating URL for: ${item.Key}`);
-      const headObjectParams = { Bucket: BUCKET_NAME, Key: item.Key };
-      const headObjectResult = await s3Client.send(new HeadObjectCommand(headObjectParams));
-
-      const metadata = headObjectResult.Metadata;
-
+      
       // Generate a pre-signed URL for private object access (default 1 hour)
       const signedUrl = await getSignedUrl(
         s3Client,
@@ -55,12 +51,9 @@ exports.handler = async (event) => {
         { expiresIn: 3600 }
       );
 
-      // 3. Construct the cake object with a pre-signed URL
+      // SIMPLIFIED: Construct a basic object with just the URL
       return {
-        id: item.Key, // Use the file key as a unique ID
-        name: metadata.name || 'Unnamed Cake',
-        description: metadata.description || '',
-        alt: metadata.alt || 'A beautiful cake',
+        id: item.Key,
         src: signedUrl,
       };
     });
