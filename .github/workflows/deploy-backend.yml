@@ -101,7 +101,7 @@ jobs:
             echo "Updating configuration (env vars) for $GET_CAKES_FUNCTION_NAME"
             aws lambda update-function-configuration \
               --function-name "$GET_CAKES_FUNCTION_NAME" \
-              --environment "Variables={AWS_REGION=${AWS_REGION},S3_BUCKET_NAME=${S3_BUCKET_NAME}}" >/dev/null
+              --environment "Variables={S3_BUCKET_NAME=${S3_BUCKET_NAME}}" >/dev/null
             echo "Waiting for $GET_CAKES_FUNCTION_NAME to finish configuration update..."
             aws lambda wait function-updated --function-name "$GET_CAKES_FUNCTION_NAME"
           else
@@ -115,7 +115,7 @@ jobs:
               --role "$GET_CAKES_ROLE_ARN" \
               --handler index.handler \
               --zip-file fileb://backend/dist/get-cakes.zip \
-              --environment "Variables={AWS_REGION=${AWS_REGION},S3_BUCKET_NAME=${S3_BUCKET_NAME}}" \
+              --environment "Variables={S3_BUCKET_NAME=${S3_BUCKET_NAME}}" \
               --timeout 30 \
               --memory-size 256 >/dev/null
             echo "Waiting for $GET_CAKES_FUNCTION_NAME to become active..."
@@ -139,7 +139,7 @@ jobs:
             echo "Updating configuration (env vars) for $UPLOAD_FUNCTION_NAME"
             aws lambda update-function-configuration \
               --function-name "$UPLOAD_FUNCTION_NAME" \
-              --environment "Variables={AWS_REGION=${AWS_REGION},S3_BUCKET_NAME=${S3_BUCKET_NAME}}" >/dev/null
+              --environment "Variables={S3_BUCKET_NAME=${S3_BUCKET_NAME}}" >/dev/null
             echo "Waiting for $UPLOAD_FUNCTION_NAME to finish configuration update..."
             aws lambda wait function-updated --function-name "$UPLOAD_FUNCTION_NAME"
           else
@@ -153,7 +153,7 @@ jobs:
               --role "$UPLOAD_ROLE_ARN" \
               --handler index.handler \
               --zip-file fileb://backend/dist/upload.zip \
-              --environment "Variables={AWS_REGION=${AWS_REGION},S3_BUCKET_NAME=${S3_BUCKET_NAME}}" \
+              --environment "Variables={S3_BUCKET_NAME=${S3_BUCKET_NAME}}" \
               --timeout 60 \
               --memory-size 512 >/dev/null
             echo "Waiting for $UPLOAD_FUNCTION_NAME to become active..."
