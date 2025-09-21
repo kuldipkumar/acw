@@ -66,11 +66,12 @@ exports.handler = async (event) => {
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Credentials': true,
+        'Content-Type': 'application/json'
       },
+      // Ensure the error message is always a simple string for safe stringification.
       body: JSON.stringify({
         success: false,
-        message: error.message || 'Internal server error',
-        error: process.env.NODE_ENV === 'development' ? error.stack : undefined
+        message: (error && error.message) ? error.message : 'An unknown error occurred during upload.'
       })
     };
   }
