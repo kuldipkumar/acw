@@ -13,7 +13,7 @@ permissions:
 
 env:
   # Region to deploy Lambdas into
-  AWS_REGION: ${{ secrets.AWS_REGION }}
+  AWS_REGION: ${{ secrets.MY_AWS_REGION }}
   # Lambda function names (create if missing; update if exists)
   GET_CAKES_FUNCTION_NAME: ${{ secrets.GET_CAKES_FUNCTION_NAME }}
   UPLOAD_FUNCTION_NAME: ${{ secrets.UPLOAD_FUNCTION_NAME }}
@@ -96,10 +96,14 @@ jobs:
             aws lambda update-function-code \
               --function-name "$GET_CAKES_FUNCTION_NAME" \
               --zip-file fileb://backend/dist/get-cakes.zip >/dev/null
+            echo "Waiting for $GET_CAKES_FUNCTION_NAME to finish code update..."
+            aws lambda wait function-updated --function-name "$GET_CAKES_FUNCTION_NAME"
             echo "Updating configuration (env vars) for $GET_CAKES_FUNCTION_NAME"
             aws lambda update-function-configuration \
               --function-name "$GET_CAKES_FUNCTION_NAME" \
               --environment "Variables={AWS_REGION=${AWS_REGION},S3_BUCKET_NAME=${S3_BUCKET_NAME}}" >/dev/null
+            echo "Waiting for $GET_CAKES_FUNCTION_NAME to finish configuration update..."
+            aws lambda wait function-updated --function-name "$GET_CAKES_FUNCTION_NAME"
           else
             echo "Creating $GET_CAKES_FUNCTION_NAME"
             if [ -z "${GET_CAKES_ROLE_ARN}" ]; then
@@ -114,6 +118,8 @@ jobs:
               --environment "Variables={AWS_REGION=${AWS_REGION},S3_BUCKET_NAME=${S3_BUCKET_NAME}}" \
               --timeout 30 \
               --memory-size 256 >/dev/null
+            echo "Waiting for $GET_CAKES_FUNCTION_NAME to become active..."
+            aws lambda wait function-active --function-name "$GET_CAKES_FUNCTION_NAME"
           fi
 
       - name: Create or Update upload-to-s3 Lambda
@@ -128,10 +134,14 @@ jobs:
             aws lambda update-function-code \
               --function-name "$UPLOAD_FUNCTION_NAME" \
               --zip-file fileb://backend/dist/upload.zip >/dev/null
+            echo "Waiting for $UPLOAD_FUNCTION_NAME to finish code update..."
+            aws lambda wait function-updated --function-name "$UPLOAD_FUNCTION_NAME"
             echo "Updating configuration (env vars) for $UPLOAD_FUNCTION_NAME"
             aws lambda update-function-configuration \
               --function-name "$UPLOAD_FUNCTION_NAME" \
               --environment "Variables={AWS_REGION=${AWS_REGION},S3_BUCKET_NAME=${S3_BUCKET_NAME}}" >/dev/null
+            echo "Waiting for $UPLOAD_FUNCTION_NAME to finish configuration update..."
+            aws lambda wait function-updated --function-name "$UPLOAD_FUNCTION_NAME"
           else
             echo "Creating $UPLOAD_FUNCTION_NAME"
             if [ -z "${UPLOAD_ROLE_ARN}" ]; then
@@ -146,6 +156,8 @@ jobs:
               --environment "Variables={AWS_REGION=${AWS_REGION},S3_BUCKET_NAME=${S3_BUCKET_NAME}}" \
               --timeout 60 \
               --memory-size 512 >/dev/null
+            echo "Waiting for $UPLOAD_FUNCTION_NAME to become active..."
+            aws lambda wait function-active --function-name "$UPLOAD_FUNCTION_NAME"
           fi
 
       - name: Output Lambda ARNs
