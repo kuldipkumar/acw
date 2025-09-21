@@ -10,75 +10,53 @@ const REGION = process.env.AWS_REGION || 'ap-south-1'; // Prefer env var
 const s3Client = new S3Client({ region: REGION });
 
 exports.handler = async (event) => {
-  console.log('--- Invoking get-cakes-lambda ---');
-  console.log('Received event:', JSON.stringify(event, null, 2));
-  console.log(`Target S3 Bucket: ${BUCKET_NAME}`);
-
-  if (!BUCKET_NAME) {
-    console.error('Error: S3_BUCKET_NAME environment variable is not set.');
-    return {
-      statusCode: 500,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: 'Server configuration error: Bucket name missing.' }),
-    };
-  }
-
-  console.log('S3 client initialized.');
+  const headers = {
+    'Content-Type': 'application/json',
+    'Access-Control-Allow-Origin': '*', // Allow requests from any origin
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  };
 
   try {
-    console.log('Attempting to list objects from bucket...');
-    const listObjectsParams = { Bucket: BUCKET_NAME };
-    const listObjectsResult = await s3Client.send(new ListObjectsV2Command(listObjectsParams));
-    console.log(`Found ${listObjectsResult.Contents.length} objects in the bucket.`);
+    console.log(`Fetching cakes from bucket: ${BUCKET_NAME}`);
+    const client = new S3Client({ region: REGION });
 
-    if (!listObjectsResult.Contents || listObjectsResult.Contents.length === 0) {
-      console.log('No objects found in the bucket.');
+    const listCommand = new ListObjectsV2Command({ Bucket: BUCKET_NAME });
+    const { Contents = [] } = await client.send(listCommand);
+
+    if (Contents.length === 0) {
+      console.log('Bucket is empty, returning empty array.');
       return {
         statusCode: 200,
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify([]),
       };
     }
 
-    console.log('Generating pre-signed URLs for each object...');
-    const cakeDataPromises = listObjectsResult.Contents.map(async (item) => {
-      console.log(`- Generating URL for: ${item.Key}`);
-      
-      // Generate a pre-signed URL for private object access (default 1 hour)
-      const signedUrl = await getSignedUrl(
-        s3Client,
-        new GetObjectCommand({ Bucket: BUCKET_NAME, Key: item.Key }),
-        { expiresIn: 3600 }
-      );
-
-      // SIMPLIFIED: Construct a basic object with just the URL
+    const imagePromises = Contents.map(async (item) => {
+      const url = await getSignedUrl(client, new GetObjectCommand({ Bucket: BUCKET_NAME, Key: item.Key }), { expiresIn: 3600 });
       return {
         id: item.Key,
-        src: signedUrl,
+        name: item.Key.split('.')[0].replace(/[-_]/g, ' '),
+        description: 'A delicious, handcrafted cake.',
+        alt: `Image of ${item.Key}`,
+        src: url,
       };
     });
 
-    // Wait for all metadata fetches to complete
-    const cakes = await Promise.all(cakeDataPromises);
+    const images = await Promise.all(imagePromises);
 
-    // 4. Return the data in the required format for API Gateway
     return {
       statusCode: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*', // Allow requests from any origin (adjust for production)
-      },
-      body: JSON.stringify(cakes),
+      headers,
+      body: JSON.stringify(images),
     };
   } catch (error) {
-    console.error('Error fetching data from S3:', error);
+    console.error('--- LAMBDA ERROR ---', error);
     return {
       statusCode: 500,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-      },
-      body: JSON.stringify({ message: 'Failed to fetch cake data.' }),
+      headers, // Ensure CORS headers are sent even on error
+      body: JSON.stringify({ message: 'Failed to fetch cakes.', error: error.message }),
     };
   }
 };
