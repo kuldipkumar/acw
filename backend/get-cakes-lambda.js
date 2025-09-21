@@ -10,14 +10,29 @@ const REGION = process.env.AWS_REGION || 'ap-south-1'; // Prefer env var
 const s3Client = new S3Client({ region: REGION });
 
 exports.handler = async (event) => {
-  // Note: We will generate pre-signed URLs instead of using the public bucket URL
+  console.log('--- Invoking get-cakes-lambda ---');
+  console.log('Received event:', JSON.stringify(event, null, 2));
+  console.log(`Target S3 Bucket: ${BUCKET_NAME}`);
+
+  if (!BUCKET_NAME) {
+    console.error('Error: S3_BUCKET_NAME environment variable is not set.');
+    return {
+      statusCode: 500,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: 'Server configuration error: Bucket name missing.' }),
+    };
+  }
+
+  console.log('S3 client initialized.');
 
   try {
-    // 1. List all objects in the S3 bucket
+    console.log('Attempting to list objects from bucket...');
     const listObjectsParams = { Bucket: BUCKET_NAME };
     const listObjectsResult = await s3Client.send(new ListObjectsV2Command(listObjectsParams));
+    console.log(`Found ${listObjectsResult.Contents.length} objects in the bucket.`);
 
     if (!listObjectsResult.Contents || listObjectsResult.Contents.length === 0) {
+      console.log('No objects found in the bucket.');
       return {
         statusCode: 200,
         headers: { 'Content-Type': 'application/json' },
@@ -25,8 +40,9 @@ exports.handler = async (event) => {
       };
     }
 
-    // 2. For each object, get its metadata and a pre-signed URL
+    console.log('Generating pre-signed URLs for each object...');
     const cakeDataPromises = listObjectsResult.Contents.map(async (item) => {
+      console.log(`- Generating URL for: ${item.Key}`);
       const headObjectParams = { Bucket: BUCKET_NAME, Key: item.Key };
       const headObjectResult = await s3Client.send(new HeadObjectCommand(headObjectParams));
 
