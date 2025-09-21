@@ -1,153 +1,81 @@
-const AWS = require('aws-sdk');
+const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
 const { v4: uuidv4 } = require('uuid');
 const path = require('path');
+const parser = require('lambda-multipart-parser');
 
-// Configure AWS SDK with environment variables
+// --- Configuration ---
+const BUCKET_NAME = process.env.S3_BUCKET_NAME || 'cakewalkbucket2';
 const REGION = process.env.AWS_REGION || 'ap-south-1';
-const S3_BUCKET_NAME = process.env.S3_BUCKET_NAME || 'cakewalkbucket2';
-const s3 = new AWS.S3({ region: REGION, signatureVersion: 'v4' });
 
-// Allowed file types
-const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+// Create an S3 client using AWS SDK v3
+const s3Client = new S3Client({ region: REGION });
 
 exports.handler = async (event) => {
-  console.log('Received event:', JSON.stringify(event, null, 2));
-  
+  // Define CORS headers to be used in all responses
+  const headers = {
+    'Content-Type': 'application/json',
+    'Access-Control-Allow-Origin': '*', // Be more specific in production
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  };
+
   try {
-    // Parse the multipart form data
-    const formData = parseMultipartFormData(event);
-    
-    // Validate the file
-    const { file, metadata } = validateAndExtractData(formData);
-    
+    // Use the robust parser to handle the multipart/form-data
+    const result = await parser.parse(event);
+
+    if (!result.files || result.files.length === 0) {
+      throw new Error('No file uploaded. Please ensure the file field is named \'image\'.');
+    }
+
+    const file = result.files[0];
+
+    // Extract metadata from the form fields
+    const { title, description, category, tags } = result;
+
     // Generate a unique filename
     const fileExt = path.extname(file.filename).toLowerCase();
     const key = `${uuidv4()}${fileExt}`;
-    
-    // Upload to S3
-    const uploadParams = {
-      Bucket: S3_BUCKET_NAME,
-      Key: key,
-      Body: file.content,
-      ContentType: file.contentType,
-      Metadata: {
-        ...JSON.parse(metadata),
-        originalName: file.filename,
-        uploadDate: new Date().toISOString()
-      }
+
+    // Prepare metadata for S3
+    const s3Metadata = {
+      title: title || '',
+      description: description || '',
+      category: category || '',
+      tags: tags || '',
+      originalname: file.filename, // Note: S3 metadata keys are lowercased
     };
-    
-    const uploadResult = await s3.upload(uploadParams).promise();
-    
+
+    // Upload to S3 using SDK v3
+    const putObjectCommand = new PutObjectCommand({
+      Bucket: BUCKET_NAME,
+      Key: key,
+      Body: file.content, // The parser provides the file content as a buffer
+      ContentType: file.contentType,
+      Metadata: s3Metadata,
+    });
+
+    await s3Client.send(putObjectCommand);
+
+    const fileLocation = `https://${BUCKET_NAME}.s3.${REGION}.amazonaws.com/${key}`;
+
     return {
       statusCode: 200,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Credentials': true,
-      },
+      headers,
       body: JSON.stringify({
         success: true,
-        message: 'File uploaded successfully',
-        data: {
-          location: uploadResult.Location,
-          key: uploadResult.Key,
-          bucket: uploadResult.Bucket,
-          metadata: uploadParams.Metadata
-        }
-      })
+        message: 'File uploaded successfully!',
+        location: fileLocation,
+      }),
     };
-    
   } catch (error) {
-    console.error('Error:', error);
-    
+    console.error('--- UPLOAD LAMBDA ERROR ---', error);
     return {
-      statusCode: error.statusCode || 500,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Credentials': true,
-        'Content-Type': 'application/json'
-      },
-      // Ensure the error message is always a simple string for safe stringification.
+      statusCode: 500,
+      headers, // IMPORTANT: Return CORS headers even on error
       body: JSON.stringify({
         success: false,
-        message: (error && error.message) ? error.message : 'An unknown error occurred during upload.'
-      })
+        message: error.message || 'An internal server error occurred.',
+      }),
     };
   }
 };
-
-function parseMultipartFormData(event) {
-  if (!event.isBase64Encoded || !event.body) {
-    throw { statusCode: 400, message: 'Invalid request format' };
-  }
-  
-  const boundary = event.headers['Content-Type'].split('boundary=')[1];
-  if (!boundary) {
-    throw { statusCode: 400, message: 'Invalid Content-Type header' };
-  }
-  
-  const body = Buffer.from(event.body, 'base64').toString('binary');
-  const parts = body.split(`--${boundary}`);
-  
-  const formData = {};
-  
-  for (const part of parts) {
-    if (part.trim() === '--' || part.trim() === '') continue;
-    
-    const [headers, ...contentParts] = part.split('\r\n\r\n');
-    const content = contentParts.join('\r\n\r\n').trim();
-    
-    const nameMatch = headers.match(/name="([^"]+)"/);
-    if (!nameMatch) continue;
-    
-    const name = nameMatch[1];
-    
-    // Handle file upload
-    const filenameMatch = headers.match(/filename="([^"]+)"/);
-    if (filenameMatch) {
-      const contentType = headers.match(/Content-Type: ([^\r\n]+)/);
-      formData[name] = {
-        filename: filenameMatch[1],
-        contentType: contentType ? contentType[1] : 'application/octet-stream',
-        content: Buffer.from(content, 'binary')
-      };
-    } else {
-      formData[name] = content;
-    }
-  }
-  
-  return formData;
-}
-
-function validateAndExtractData(formData) {
-  // Check if required fields exist
-  if (!formData.file) {
-    throw { statusCode: 400, message: 'No file provided' };
-  }
-  
-  // Validate file type
-  if (!ALLOWED_TYPES.includes(formData.file.contentType)) {
-    throw { statusCode: 400, message: `File type not allowed. Allowed types: ${ALLOWED_TYPES.join(', ')}` };
-  }
-  
-  // Validate file size
-  if (formData.file.content.length > MAX_FILE_SIZE) {
-    throw { statusCode: 400, message: `File too large. Maximum size is ${MAX_FILE_SIZE / (1024 * 1024)}MB` };
-  }
-  
-  // Validate metadata
-  let metadata = {};
-  if (formData.metadata) {
-    try {
-      metadata = JSON.parse(formData.metadata);
-    } catch (e) {
-      console.warn('Invalid metadata format, using empty object');
-    }
-  }
-  
-  return {
-    file: formData.file,
-    metadata: JSON.stringify(metadata)
-  };
-}
