@@ -1,0 +1,152 @@
+name: Deploy Backend Lambdas
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'backend/**'
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  # Region to deploy Lambdas into
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  # Lambda function names (create if missing; update if exists)
+  GET_CAKES_FUNCTION_NAME: ${{ secrets.GET_CAKES_FUNCTION_NAME }}
+  UPLOAD_FUNCTION_NAME: ${{ secrets.UPLOAD_FUNCTION_NAME }}
+  # Execution role for create-function (must be a Lambda role ARN)
+  AWS_LAMBDA_ROLE_ARN: ${{ secrets.AWS_LAMBDA_ROLE_ARN }}
+  # App configuration passed to Lambda environment
+  S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
+
+jobs:
+  deploy:
+    name: Build and Deploy Lambdas
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Package get-cakes Lambda
+        run: |
+          set -e
+          mkdir -p backend/dist/get-cakes
+          cp backend/get-cakes-lambda.js backend/dist/get-cakes/index.js
+          cat > backend/dist/get-cakes/package.json <<'PKG'
+          {
+            "name": "get-cakes-lambda",
+            "version": "1.0.0",
+            "private": true,
+            "dependencies": {
+              "@aws-sdk/client-s3": "^3.525.0",
+              "@aws-sdk/s3-request-presigner": "^3.525.0"
+            }
+          }
+          PKG
+          cd backend/dist/get-cakes
+          npm ci || npm install
+          cd -
+          cd backend/dist/get-cakes && zip -r ../get-cakes.zip . && cd -
+
+      - name: Package upload-to-s3 Lambda
+        run: |
+          set -e
+          mkdir -p backend/dist/upload
+          cp backend/upload-to-s3-lambda.js backend/dist/upload/index.js
+          cat > backend/dist/upload/package.json <<'PKG'
+          {
+            "name": "upload-to-s3-lambda",
+            "version": "1.0.0",
+            "private": true,
+            "dependencies": {
+              "aws-sdk": "^2.1568.0",
+              "uuid": "^9.0.1"
+            }
+          }
+          PKG
+          cd backend/dist/upload
+          npm ci || npm install
+          cd -
+          cd backend/dist/upload && zip -r ../upload.zip . && cd -
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Create or Update get-cakes Lambda
+        shell: bash
+        run: |
+          set -e
+          if [ -z "${GET_CAKES_FUNCTION_NAME}" ]; then
+            echo "GET_CAKES_FUNCTION_NAME secret not set" >&2; exit 1;
+          fi
+          if aws lambda get-function --function-name "$GET_CAKES_FUNCTION_NAME" >/dev/null 2>&1; then
+            echo "Updating code for $GET_CAKES_FUNCTION_NAME"
+            aws lambda update-function-code \
+              --function-name "$GET_CAKES_FUNCTION_NAME" \
+              --zip-file fileb://backend/dist/get-cakes.zip >/dev/null
+            echo "Updating configuration (env vars) for $GET_CAKES_FUNCTION_NAME"
+            aws lambda update-function-configuration \
+              --function-name "$GET_CAKES_FUNCTION_NAME" \
+              --environment "Variables={AWS_REGION=${AWS_REGION},S3_BUCKET_NAME=${S3_BUCKET_NAME}}" >/dev/null
+          else
+            echo "Creating $GET_CAKES_FUNCTION_NAME"
+            if [ -z "${AWS_LAMBDA_ROLE_ARN}" ]; then
+              echo "AWS_LAMBDA_ROLE_ARN secret not set (required to create function)" >&2; exit 1;
+            fi
+            aws lambda create-function \
+              --function-name "$GET_CAKES_FUNCTION_NAME" \
+              --runtime nodejs18.x \
+              --role "$AWS_LAMBDA_ROLE_ARN" \
+              --handler index.handler \
+              --zip-file fileb://backend/dist/get-cakes.zip \
+              --environment "Variables={AWS_REGION=${AWS_REGION},S3_BUCKET_NAME=${S3_BUCKET_NAME}}" \
+              --timeout 30 \
+              --memory-size 256 >/dev/null
+          fi
+
+      - name: Create or Update upload-to-s3 Lambda
+        shell: bash
+        run: |
+          set -e
+          if [ -z "${UPLOAD_FUNCTION_NAME}" ]; then
+            echo "UPLOAD_FUNCTION_NAME secret not set" >&2; exit 1;
+          fi
+          if aws lambda get-function --function-name "$UPLOAD_FUNCTION_NAME" >/dev/null 2>&1; then
+            echo "Updating code for $UPLOAD_FUNCTION_NAME"
+            aws lambda update-function-code \
+              --function-name "$UPLOAD_FUNCTION_NAME" \
+              --zip-file fileb://backend/dist/upload.zip >/dev/null
+            echo "Updating configuration (env vars) for $UPLOAD_FUNCTION_NAME"
+            aws lambda update-function-configuration \
+              --function-name "$UPLOAD_FUNCTION_NAME" \
+              --environment "Variables={AWS_REGION=${AWS_REGION},S3_BUCKET_NAME=${S3_BUCKET_NAME}}" >/dev/null
+          else
+            echo "Creating $UPLOAD_FUNCTION_NAME"
+            if [ -z "${AWS_LAMBDA_ROLE_ARN}" ]; then
+              echo "AWS_LAMBDA_ROLE_ARN secret not set (required to create function)" >&2; exit 1;
+            fi
+            aws lambda create-function \
+              --function-name "$UPLOAD_FUNCTION_NAME" \
+              --runtime nodejs18.x \
+              --role "$AWS_LAMBDA_ROLE_ARN" \
+              --handler index.handler \
+              --zip-file fileb://backend/dist/upload.zip \
+              --environment "Variables={AWS_REGION=${AWS_REGION},S3_BUCKET_NAME=${S3_BUCKET_NAME}}" \
+              --timeout 60 \
+              --memory-size 512 >/dev/null
+          fi
+
+      - name: Output Lambda ARNs
+        run: |
+          aws lambda get-function --function-name "$GET_CAKES_FUNCTION_NAME" --query 'Configuration.FunctionArn' --output text
+          aws lambda get-function --function-name "$UPLOAD_FUNCTION_NAME" --query 'Configuration.FunctionArn' --output text
