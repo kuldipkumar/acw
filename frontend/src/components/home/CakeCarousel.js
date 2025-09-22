@@ -15,11 +15,16 @@ const CakeCarousel = () => {
     const fetchCakes = async () => {
       try {
         // Use local backend during development; CRA proxy will route /api to backend
-        const response = await fetch('/api/cakes');
+        const baseUrl = process.env.REACT_APP_API_BASE_URL
+        const response = await fetch(`${baseUrl}/dev/cakes`);
+        
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        const data = await response.json();
+        const result = await response.json();
+        console.log('API Response:', result); // Log the variable, not the function call
+        // The body from a REST API Lambda proxy is often a string, so we need to parse it again.
+        const data = typeof result.body === 'string' ? JSON.parse(result.body) : result;
         setCakes(data);
       } catch (e) {
         console.error('Failed to fetch cakes:', e);

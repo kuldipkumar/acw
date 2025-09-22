@@ -38,8 +38,12 @@ const AdminPage = () => {
 
     try {
       const formData = new FormData();
-      formData.append('file', selectedFile);
-      formData.append('metadata', JSON.stringify(metadata));
+      formData.append('image', selectedFile); // Use 'image' to match Postman test
+
+      // Append each metadata field separately
+      for (const key in metadata) {
+        formData.append(key, metadata[key]);
+      }
 
       await uploadToS3(formData);
       setUploadStatus('Upload successful!');

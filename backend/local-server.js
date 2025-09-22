@@ -55,8 +55,8 @@ const upload = multer({
   limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit
 });
 
-// Upload endpoint
-app.post('/api/upload', upload.single('file'), async (req, res) => {
+// Upload endpoint - matches the Lambda function exactly
+app.post('/api/cakes', upload.single('image'), async (req, res) => {
   console.log('Upload request received');
   console.log('Request body:', JSON.stringify(req.body, null, 2));
   console.log('Request file:', req.file ? 'File received' : 'No file received');
@@ -68,9 +68,13 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
         message: 'Uploads are disabled: missing AWS credentials on the server.'
       });
     }
+    
     if (!req.file) {
       console.error('No file uploaded');
-      return res.status(400).json({ error: 'No file uploaded' });
+      return res.status(400).json({ 
+        success: false,
+        message: 'No file uploaded. Please ensure the file field is named \'image\'.' 
+      });
     }
 
     // Log file details
@@ -80,25 +84,27 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
       size: req.file.size
     });
 
-    // Extract metadata from body with safe defaults
-    const { title = '', description = '', category = '', tags = '' } = req.body || {};
-    // Always use our configured bucket to avoid NoSuchBucket errors
-    const bucket = BUCKET_NAME;
+    // Extract metadata from body - matches Lambda destructuring
+    const { title, description, category, tags } = req.body;
 
     const fileExtension = path.extname(req.file.originalname).toLowerCase();
     const key = `${uuidv4()}${fileExtension}`;
 
+    // Prepare metadata for S3 - matches Lambda structure
+    const s3Metadata = {
+      title: title || '',
+      description: description || '',
+      category: category || '',
+      tags: tags || '',
+      originalname: req.file.originalname, // Note: S3 metadata keys are lowercased
+    };
+
     const params = {
-      Bucket: bucket,
+      Bucket: BUCKET_NAME,
       Key: key,
       Body: require('fs').createReadStream(req.file.path),
       ContentType: req.file.mimetype,
-      Metadata: {
-        title,
-        description,
-        category,
-        tags
-      }
+      Metadata: s3Metadata
     };
 
     console.log('Uploading to S3 with params:', JSON.stringify({
@@ -116,21 +122,16 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
       fs.unlinkSync(req.file.path);
     }
 
+    const fileLocation = `https://${BUCKET_NAME}.s3.${REGION}.amazonaws.com/${key}`;
+
+    // Match Lambda response format exactly
     res.json({
       success: true,
-      message: 'File uploaded successfully',
-      data: {
-        location: uploadResult.Location,
-        key: uploadResult.Key,
-        bucket: uploadResult.Bucket,
-        metadata: params.Metadata
-      }
+      message: 'File uploaded successfully!',
+      location: fileLocation
     });
   } catch (error) {
     console.error('Upload error:', error);
-    if (error.code) console.error('Error code:', error.code);
-    if (error.statusCode) console.error('Status code:', error.statusCode);
-    if (error.region) console.error('Region:', error.region);
     
     // Clean up the temporary file if it exists
     if (req.file && req.file.path && fs.existsSync(req.file.path)) {
@@ -139,13 +140,7 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
 
     res.status(500).json({
       success: false,
-      message: 'Error uploading file',
-      error: process.env.NODE_ENV === 'development' ? {
-        message: error.message,
-        code: error.code,
-        statusCode: error.statusCode,
-        region: error.region
-      } : 'Internal server error'
+      message: error.message || 'An internal server error occurred.'
     });
   }
 });

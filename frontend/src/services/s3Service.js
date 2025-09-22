@@ -1,8 +1,7 @@
-import { API_BASE as API_URL } from '../config';
-
 export const uploadToS3 = async (formData) => {
   try {
-    const response = await fetch(`${API_URL}/upload`, {
+    const baseUrl = process.env.REACT_APP_API_BASE_URL;
+    const response = await fetch(`${baseUrl}/cakes`, {
       method: 'POST',
       body: formData,
       // Note: Don't set Content-Type header when using FormData
@@ -24,7 +23,8 @@ export const uploadToS3 = async (formData) => {
 // Helper function to get presigned URL for direct upload (if needed in the future)
 export const getPresignedUrl = async (fileName, fileType, bucketName) => {
   try {
-    const response = await fetch(`${API_URL}/presigned-url`, {
+    const baseUrl = process.env.REACT_APP_API_BASE_URL;
+    const response = await fetch(`${baseUrl}/presigned-url`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
