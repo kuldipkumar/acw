@@ -16,7 +16,7 @@ const CakeCarousel = () => {
       try {
         // Use local backend during development; CRA proxy will route /api to backend
         const baseUrl = process.env.REACT_APP_API_BASE_URL
-        const response = await fetch(`${baseUrl}/dev/cakes`);
+        const response = await fetch(`${baseUrl}/cakes`);
         
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
