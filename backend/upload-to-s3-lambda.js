@@ -20,21 +20,37 @@ exports.handler = async (event) => {
   };
 
   try {
+    console.log('=== LAMBDA UPLOAD HANDLER START ===');
+    console.log('Event received:', JSON.stringify(event, null, 2));
+    console.log('Event headers:', JSON.stringify(event.headers, null, 2));
+    console.log('Event body type:', typeof event.body);
+    console.log('Event body length:', event.body ? event.body.length : 'null');
+    console.log('Event isBase64Encoded:', event.isBase64Encoded);
+    
     // Use the robust parser to handle the multipart/form-data
+    console.log('Attempting to parse multipart data...');
     const result = await parser.parse(event);
+    console.log('Parser result:', JSON.stringify(result, null, 2));
 
     if (!result.files || result.files.length === 0) {
       throw new Error('No file uploaded. Please ensure the file field is named \'image\'.');
     }
 
     const file = result.files[0];
+    console.log('File found:', {
+      filename: file.filename,
+      contentType: file.contentType,
+      size: file.content ? file.content.length : 'no content'
+    });
 
     // Extract metadata from the form fields
     const { title, description, category, tags } = result;
+    console.log('Extracted metadata:', { title, description, category, tags });
 
     // Generate a unique filename
     const fileExt = path.extname(file.filename).toLowerCase();
     const key = `${uuidv4()}${fileExt}`;
+    console.log('Generated S3 key:', key);
 
     // Prepare metadata for S3
     const s3Metadata = {
@@ -44,6 +60,7 @@ exports.handler = async (event) => {
       tags: tags || '',
       originalname: file.filename, // Note: S3 metadata keys are lowercased
     };
+    console.log('S3 metadata prepared:', s3Metadata);
 
     // Upload to S3 using SDK v3
     const putObjectCommand = new PutObjectCommand({
@@ -54,10 +71,13 @@ exports.handler = async (event) => {
       Metadata: s3Metadata,
     });
 
+    console.log('Uploading to S3...');
     await s3Client.send(putObjectCommand);
+    console.log('S3 upload successful!');
 
     const fileLocation = `https://${BUCKET_NAME}.s3.${REGION}.amazonaws.com/${key}`;
 
+    console.log('=== LAMBDA UPLOAD HANDLER SUCCESS ===');
     return {
       statusCode: 200,
       headers,
@@ -68,13 +88,20 @@ exports.handler = async (event) => {
       }),
     };
   } catch (error) {
-    console.error('--- UPLOAD LAMBDA ERROR ---', error);
+    console.error('=== LAMBDA UPLOAD HANDLER ERROR ===');
+    console.error('Error type:', error.constructor.name);
+    console.error('Error message:', error.message);
+    console.error('Error stack:', error.stack);
+    console.error('Full error object:', JSON.stringify(error, Object.getOwnPropertyNames(error), 2));
+    
     return {
       statusCode: 500,
       headers, // IMPORTANT: Return CORS headers even on error
       body: JSON.stringify({
         success: false,
         message: error.message || 'An internal server error occurred.',
+        errorType: error.constructor.name,
+        timestamp: new Date().toISOString()
       }),
     };
   }
