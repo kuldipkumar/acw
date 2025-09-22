@@ -15,9 +15,6 @@ function App() {
       <div className="App">
         <Header />
         <main>
-          <p>
-            Welcome to ACW - Your Premier Cake Destination!
-          </p>
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/menu" element={<MenuPage />} />
