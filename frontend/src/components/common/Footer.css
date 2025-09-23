@@ -124,14 +124,156 @@
   color: var(--accent-color);
 }
 
-@media (max-width: 768px) {
+/* Responsive Design */
+@media (max-width: 1200px) {
   .footer-content {
-    grid-template-columns: 1fr;
+    padding: 0 1.5rem;
+    gap: 2.5rem;
+  }
+  
+  .brand-name-footer {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 968px) {
+  .footer {
+    padding: 2.5rem 0 1rem;
+  }
+  
+  .footer-content {
+    grid-template-columns: 1fr 1fr;
     gap: 2rem;
+    padding: 0 1rem;
+  }
+  
+  .footer-section:first-child {
+    grid-column: 1 / -1;
     text-align: center;
+    margin-bottom: 1rem;
   }
   
   .footer-socials {
     justify-content: center;
+  }
+  
+  .brand-name-footer {
+    font-size: 1.8rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .footer {
+    padding: 2rem 0 1rem;
+  }
+  
+  .footer-content {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    text-align: center;
+    padding: 0 1rem;
+  }
+  
+  .footer-socials {
+    justify-content: center;
+  }
+  
+  .brand-name-footer {
+    font-size: 1.6rem;
+  }
+  
+  .footer-section h3 {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+  }
+  
+  .contact-info {
+    align-items: center;
+  }
+  
+  .contact-item {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .footer {
+    padding: 1.5rem 0 0.5rem;
+    margin-top: 1.5rem;
+  }
+  
+  .footer-content {
+    padding: 0 0.5rem;
+    gap: 1.5rem;
+  }
+  
+  .brand-name-footer {
+    font-size: 1.4rem;
+  }
+  
+  .brand-tagline {
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+  }
+  
+  .footer-section h3 {
+    font-size: 1.1rem;
+  }
+  
+  .footer-section ul li a {
+    font-size: 0.9rem;
+  }
+  
+  .footer-socials a {
+    width: 35px;
+    height: 35px;
+    font-size: 1.1rem;
+  }
+  
+  .contact-item {
+    font-size: 0.9rem;
+  }
+  
+  .footer-bottom {
+    padding: 1.5rem 0 0.5rem;
+  }
+  
+  .footer-credit {
+    font-size: 0.8rem;
+  }
+}
+
+/* Large screens optimization */
+@media (min-width: 1400px) {
+  .footer {
+    padding: 4rem 0 1.5rem;
+  }
+  
+  .footer-content {
+    max-width: 1400px;
+    padding: 0 3rem;
+    gap: 4rem;
+  }
+  
+  .brand-name-footer {
+    font-size: 2.5rem;
+  }
+  
+  .brand-tagline {
+    font-size: 1.1rem;
+  }
+  
+  .footer-section h3 {
+    font-size: 1.4rem;
+  }
+  
+  .footer-section ul li a {
+    font-size: 1.1rem;
+  }
+  
+  .footer-socials a {
+    width: 45px;
+    height: 45px;
+    font-size: 1.3rem;
   }
 }

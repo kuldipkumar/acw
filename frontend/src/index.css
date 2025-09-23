@@ -48,3 +48,36 @@ a:hover {
   text-decoration: none;
 }
 
+/* Global responsive improvements */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Responsive typography */
+@media (max-width: 768px) {
+  body {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    font-size: 13px;
+  }
+}
+
+/* Large screens optimization */
+@media (min-width: 1400px) {
+  body {
+    font-size: 16px;
+    line-height: 1.7;
+  }
+}
+

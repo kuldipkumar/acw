@@ -190,10 +190,177 @@
   content: '→';
 }
 
-/* Hide arrows on smaller screens */
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .carousel-section {
+    padding: 4rem 0;
+  }
+  
+  .section-title {
+    font-size: 2.5rem;
+  }
+  
+  .cake-image {
+    height: 280px;
+  }
+  
+  .cake-info {
+    padding: 1.2rem;
+  }
+}
+
+@media (max-width: 968px) {
+  .carousel-section {
+    padding: 3rem 0;
+  }
+  
+  .section-header {
+    margin-bottom: 2.5rem;
+    padding: 0 1.5rem;
+  }
+  
+  .section-title {
+    font-size: 2.2rem;
+  }
+  
+  .section-subtitle {
+    font-size: 1.1rem;
+  }
+  
+  .cake-image {
+    height: 250px;
+  }
+  
+  .cake-name {
+    font-size: 1.3rem;
+  }
+  
+  .cake-description {
+    font-size: 0.95rem;
+  }
+}
+
 @media (max-width: 768px) {
+  .carousel-section {
+    padding: 2.5rem 0;
+  }
+  
+  .section-header {
+    padding: 0 1rem;
+    margin-bottom: 2rem;
+  }
+  
+  .section-title {
+    font-size: 1.8rem;
+  }
+  
+  .section-subtitle {
+    font-size: 1rem;
+  }
+  
+  .cake-slide {
+    padding: 0 0.5rem;
+  }
+  
+  .cake-image {
+    height: 220px;
+  }
+  
+  .cake-info {
+    padding: 1rem;
+  }
+  
+  .cake-name {
+    font-size: 1.2rem;
+  }
+  
+  .view-all-btn {
+    padding: 0.7rem 2rem;
+    font-size: 1rem;
+  }
+  
+  /* Hide arrows on smaller screens */
   .slick-prev,
   .slick-next {
     display: none !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .carousel-section {
+    padding: 2rem 0;
+  }
+  
+  .section-header {
+    margin-bottom: 1.5rem;
+  }
+  
+  .section-title {
+    font-size: 1.6rem;
+  }
+  
+  .section-subtitle {
+    font-size: 0.95rem;
+  }
+  
+  .cake-image {
+    height: 200px;
+  }
+  
+  .cake-info {
+    padding: 0.8rem;
+  }
+  
+  .cake-name {
+    font-size: 1.1rem;
+  }
+  
+  .cake-description {
+    font-size: 0.9rem;
+  }
+  
+  .view-all-btn {
+    padding: 0.6rem 1.5rem;
+    font-size: 0.9rem;
+  }
+  
+  .section-footer {
+    margin-top: 2rem;
+  }
+}
+
+/* Large screens optimization */
+@media (min-width: 1400px) {
+  .carousel-section {
+    padding: 6rem 0;
+  }
+  
+  .section-title {
+    font-size: 3.5rem;
+  }
+  
+  .section-subtitle {
+    font-size: 1.3rem;
+  }
+  
+  .cake-image {
+    height: 350px;
+  }
+  
+  .cake-info {
+    padding: 2rem;
+  }
+  
+  .cake-name {
+    font-size: 1.7rem;
+  }
+  
+  .cake-description {
+    font-size: 1.1rem;
+  }
+  
+  .view-all-btn {
+    padding: 1rem 3rem;
+    font-size: 1.2rem;
   }
 }

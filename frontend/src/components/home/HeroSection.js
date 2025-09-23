@@ -1,10 +1,8 @@
 import React from 'react';
 import './HeroSection.css';
 
-// Using working images (local files are empty placeholders)
-const cakeImage1 = 'https://images.unsplash.com/photo-1627834377411-8da5f4f09de8?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
-const cakeImage2 = 'https://images.unsplash.com/photo-1627834377411-8da5f4f09de8?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
-const cakeImage3 = 'https://images.unsplash.com/photo-1559620192-032c4bc4674e?q=80&w=1964&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
+// Hero image - elegant single image (will be moved to S3 in future)
+const heroImage = 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?q=80&w=2089&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
 
 const HeroSection = () => {
   return (
@@ -19,10 +17,8 @@ const HeroSection = () => {
         </p>
         <button className="hero-cta-btn">Explore Our Creations</button>
       </div>
-      <div className="hero-images">
-        <img src={cakeImage1} alt="Artisan Cake 1" className="hero-img hero-img-1" />
-        <img src={cakeImage2} alt="Artisan Cake 2" className="hero-img hero-img-2" />
-        <img src={cakeImage3} alt="Artisan Cake 3" className="hero-img hero-img-3" />
+      <div className="hero-image-container">
+        <img src={heroImage} alt="Exquisite CakeWalk Creation" className="hero-main-image" />
       </div>
     </section>
   );
