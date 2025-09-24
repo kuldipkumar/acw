@@ -44,6 +44,7 @@
   width: 100%;
   height: 300px;
   object-fit: cover;
+  object-position: center 30%; /* Show more of the top portion of cakes */
 }
 
 .cake-info {
@@ -202,6 +203,7 @@
   
   .cake-image {
     height: 280px;
+    object-position: center 25%;
   }
   
   .cake-info {
@@ -229,6 +231,7 @@
   
   .cake-image {
     height: 250px;
+    object-position: center 25%;
   }
   
   .cake-name {
@@ -264,6 +267,7 @@
   
   .cake-image {
     height: 220px;
+    object-position: center 20%;
   }
   
   .cake-info {
@@ -305,6 +309,7 @@
   
   .cake-image {
     height: 200px;
+    object-position: center 20%;
   }
   
   .cake-info {
@@ -345,6 +350,7 @@
   
   .cake-image {
     height: 350px;
+    object-position: center 30%;
   }
   
   .cake-info {
