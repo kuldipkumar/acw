@@ -155,23 +155,50 @@ app.get('/api/cakes', async (req, res) => {
         {
           id: 'mock-1',
           name: 'Chocolate Delight',
-          description: 'Rich chocolate cake with ganache.',
-          alt: 'Chocolate cake',
-          src: 'https://via.placeholder.com/800x500.png?text=Chocolate+Cake'
+          description: 'Rich chocolate cake with ganache and fresh berries.',
+          category: 'chocolate',
+          tags: ['chocolate', 'birthday', 'premium'],
+          originalname: 'chocolate-delight.jpg',
+          alt: 'Chocolate cake with ganache',
+          src: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?q=80&w=800&auto=format&fit=crop',
+          lastModified: new Date().toISOString(),
+          size: 1024000
         },
         {
           id: 'mock-2',
           name: 'Vanilla Dream',
-          description: 'Classic vanilla sponge with cream.',
-          alt: 'Vanilla cake',
-          src: 'https://via.placeholder.com/800x500.png?text=Vanilla+Cake'
+          description: 'Classic vanilla sponge with cream and seasonal fruits.',
+          category: 'vanilla',
+          tags: ['vanilla', 'anniversary', 'classic'],
+          originalname: 'vanilla-dream.jpg',
+          alt: 'Vanilla cake with cream',
+          src: 'https://images.unsplash.com/photo-1588195538326-c5b1e9f80a1b?q=80&w=800&auto=format&fit=crop',
+          lastModified: new Date().toISOString(),
+          size: 956000
         },
         {
           id: 'mock-3',
           name: 'Red Velvet Bliss',
-          description: 'Velvety layers with cream cheese frosting.',
-          alt: 'Red velvet cake',
-          src: 'https://via.placeholder.com/800x500.png?text=Red+Velvet+Cake'
+          description: 'Velvety layers with cream cheese frosting and elegant decoration.',
+          category: 'specialty',
+          tags: ['red-velvet', 'wedding', 'elegant'],
+          originalname: 'red-velvet-bliss.jpg',
+          alt: 'Red velvet cake with cream cheese frosting',
+          src: 'https://images.unsplash.com/photo-1586985289688-ca3cf47d3e6e?q=80&w=800&auto=format&fit=crop',
+          lastModified: new Date().toISOString(),
+          size: 1200000
+        },
+        {
+          id: 'mock-4',
+          name: 'Strawberry Surprise',
+          description: 'Fresh strawberry cake with whipped cream and berry compote.',
+          category: 'fruit',
+          tags: ['strawberry', 'fresh', 'summer'],
+          originalname: 'strawberry-surprise.jpg',
+          alt: 'Strawberry cake with fresh berries',
+          src: 'https://images.unsplash.com/photo-1627834377411-8da5f4f09de8?q=80&w=800&auto=format&fit=crop',
+          lastModified: new Date().toISOString(),
+          size: 890000
         }
       ]);
     }
@@ -180,19 +207,44 @@ app.get('/api/cakes', async (req, res) => {
     const list = await s3.listObjectsV2({ Bucket: BUCKET_NAME }).promise();
     const contents = list.Contents || [];
 
-    // For each object, fetch metadata and build a signed URL
+    // For each object, fetch metadata and build a signed URL - matches updated Lambda
     const results = await Promise.all(contents.map(async (item) => {
-      const head = await s3.headObject({ Bucket: BUCKET_NAME, Key: item.Key }).promise();
-      const metadata = head.Metadata || {};
-      const signedUrl = s3.getSignedUrl('getObject', { Bucket: BUCKET_NAME, Key: item.Key, Expires: 3600 });
+      try {
+        const head = await s3.headObject({ Bucket: BUCKET_NAME, Key: item.Key }).promise();
+        const metadata = head.Metadata || {};
+        const signedUrl = s3.getSignedUrl('getObject', { Bucket: BUCKET_NAME, Key: item.Key, Expires: 3600 });
 
-      return {
-        id: item.Key,
-        name: metadata.name || 'Unnamed Cake',
-        description: metadata.description || '',
-        alt: metadata.alt || 'Cake image',
-        src: signedUrl,
-      };
+        console.log(`Metadata for ${item.Key}:`, metadata);
+
+        return {
+          id: item.Key,
+          name: metadata.title || item.Key.split('.')[0].replace(/[-_]/g, ' '),
+          description: metadata.description || 'A delicious, handcrafted cake.',
+          category: metadata.category || 'general',
+          tags: metadata.tags ? metadata.tags.split(',').map(tag => tag.trim()) : [],
+          originalname: metadata.originalname || item.Key,
+          alt: `Image of ${metadata.title || item.Key}`,
+          src: signedUrl,
+          lastModified: item.LastModified,
+          size: item.Size,
+        };
+      } catch (error) {
+        console.error(`Error processing ${item.Key}:`, error);
+        // Fallback if metadata retrieval fails
+        const signedUrl = s3.getSignedUrl('getObject', { Bucket: BUCKET_NAME, Key: item.Key, Expires: 3600 });
+        return {
+          id: item.Key,
+          name: item.Key.split('.')[0].replace(/[-_]/g, ' '),
+          description: 'A delicious, handcrafted cake.',
+          category: 'general',
+          tags: [],
+          originalname: item.Key,
+          alt: `Image of ${item.Key}`,
+          src: signedUrl,
+          lastModified: item.LastModified,
+          size: item.Size,
+        };
+      }
     }));
 
     res.json(results);
