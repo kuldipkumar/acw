@@ -3,11 +3,12 @@
 
 :root {
   --primary-color: #212529; /* Dark text */
-  --secondary-color: #fdfcf8; /* Light beige background */
-  --accent-color: #d92691; /* Vibrant Pink */
-  --accent-hover-color: #b91c7a; /* Darker Pink for hover */
-  --background-color: #fdfcf8; /* Light beige background */
-  --teal-accent: #00a99d;
+  --secondary-color: #f8fdf8; /* Light green background */
+  --accent-color: #00a99d; /* Teal Green */
+  --accent-hover-color: #008a7b; /* Darker Green for hover */
+  --background-color: #f8fdf8; /* Light green background */
+  --primary-green: #00a99d; /* Main green */
+  --light-green: #e8f5f3; /* Very light green */
 }
 
 * {

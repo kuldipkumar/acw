@@ -37,7 +37,7 @@ const MenuPage = () => {
       <div className="menu-container">
         <div className="menu-columns">
           <div className="menu-column">
-            <h2 className="menu-category">Celebration Cake Flavours</h2>
+            <h2 className="menu-category">Cake Flavours</h2>
             <ul className="menu-list">
               {celebrationCakes.map((cake, index) => (
                 <li key={index} className="menu-item">{cake}</li>

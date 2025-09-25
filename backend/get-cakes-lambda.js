@@ -1,5 +1,5 @@
 // Import the S3 client and commands from AWS SDK v3 (CommonJS)
-const { S3Client, ListObjectsV2Command, HeadObjectCommand, GetObjectCommand } = require('@aws-sdk/client-s3');
+const { S3Client, ListObjectsV2Command, GetObjectCommand, HeadObjectCommand } = require('@aws-sdk/client-s3');
 const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
 
 // --- Configuration ---
@@ -35,14 +35,46 @@ exports.handler = async (event) => {
     }
 
     const imagePromises = Contents.map(async (item) => {
-      const url = await getSignedUrl(client, new GetObjectCommand({ Bucket: BUCKET_NAME, Key: item.Key }), { expiresIn: 3600 });
-      return {
-        id: item.Key,
-        name: item.Key.split('.')[0].replace(/[-_]/g, ' '),
-        description: 'A delicious, handcrafted cake.',
-        alt: `Image of ${item.Key}`,
-        src: url,
-      };
+      try {
+        // Get signed URL for the image
+        const url = await getSignedUrl(client, new GetObjectCommand({ Bucket: BUCKET_NAME, Key: item.Key }), { expiresIn: 3600 });
+        
+        // Get object metadata
+        const headCommand = new HeadObjectCommand({ Bucket: BUCKET_NAME, Key: item.Key });
+        const headResponse = await client.send(headCommand);
+        const metadata = headResponse.Metadata || {};
+        
+        console.log(`Metadata for ${item.Key}:`, metadata);
+        
+        return {
+          id: item.Key,
+          name: metadata.title || item.Key.split('.')[0].replace(/[-_]/g, ' '),
+          description: metadata.description || 'A delicious, handcrafted cake.',
+          category: metadata.category || 'general',
+          tags: metadata.tags ? metadata.tags.split(',').map(tag => tag.trim()) : [],
+          originalname: metadata.originalname || item.Key,
+          alt: `Image of ${metadata.title || item.Key}`,
+          src: url,
+          lastModified: item.LastModified,
+          size: item.Size,
+        };
+      } catch (error) {
+        console.error(`Error processing ${item.Key}:`, error);
+        // Fallback if metadata retrieval fails
+        const url = await getSignedUrl(client, new GetObjectCommand({ Bucket: BUCKET_NAME, Key: item.Key }), { expiresIn: 3600 });
+        return {
+          id: item.Key,
+          name: item.Key.split('.')[0].replace(/[-_]/g, ' '),
+          description: 'A delicious, handcrafted cake.',
+          category: 'general',
+          tags: [],
+          originalname: item.Key,
+          alt: `Image of ${item.Key}`,
+          src: url,
+          lastModified: item.LastModified,
+          size: item.Size,
+        };
+      }
     });
 
     const images = await Promise.all(imagePromises);
