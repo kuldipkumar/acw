@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
 const AWS = require('aws-sdk');
+const bcrypt = require('bcryptjs');
 const { v4: uuidv4 } = require('uuid');
 const path = require('path');
 const fs = require('fs');
@@ -55,8 +56,80 @@ const upload = multer({
   limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit
 });
 
-// Upload endpoint - matches the Lambda function exactly
-app.post('/api/cakes', upload.single('image'), async (req, res) => {
+// Authentication middleware
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
+
+  if (!token) {
+    return res.status(401).json({
+      success: false,
+      message: 'Unauthorized: No token provided'
+    });
+  }
+
+  // Basic token validation (in production, verify JWT properly)
+  if (token.length < 10) {
+    return res.status(401).json({
+      success: false,
+      message: 'Unauthorized: Invalid token'
+    });
+  }
+
+  next();
+};
+
+// Login endpoint
+app.post('/api/auth/login', async (req, res) => {
+  try {
+    const { password } = req.body;
+
+    if (!password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Password is required'
+      });
+    }
+
+    const adminPasswordHash = process.env.ADMIN_PASSWORD_HASH;
+
+    if (!adminPasswordHash) {
+      console.error('ADMIN_PASSWORD_HASH not configured in .env');
+      return res.status(500).json({
+        success: false,
+        message: 'Authentication not configured'
+      });
+    }
+
+    // Verify password
+    const isValid = await bcrypt.compare(password, adminPasswordHash);
+
+    if (!isValid) {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid password'
+      });
+    }
+
+    // Generate simple token (in production, use JWT)
+    const token = Buffer.from(`admin:${Date.now()}:${Math.random()}`).toString('base64');
+
+    res.json({
+      success: true,
+      message: 'Login successful',
+      token
+    });
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Authentication failed'
+    });
+  }
+});
+
+// Upload endpoint - now protected with authentication
+app.post('/api/upload', authenticateToken, upload.single('image'), async (req, res) => {
   console.log('Upload request received');
   console.log('Request body:', JSON.stringify(req.body, null, 2));
   console.log('Request file:', req.file ? 'File received' : 'No file received');

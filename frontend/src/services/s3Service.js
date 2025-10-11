@@ -1,8 +1,16 @@
-export const uploadToS3 = async (formData) => {
+export const uploadToS3 = async (formData, authToken) => {
   try {
     const baseUrl = process.env.REACT_APP_API_BASE_URL;
-    const response = await fetch(`${baseUrl}/cakes`, {
+    const headers = {};
+    
+    // Add auth token if provided
+    if (authToken) {
+      headers['Authorization'] = `Bearer ${authToken}`;
+    }
+    
+    const response = await fetch(`${baseUrl}/upload`, {
       method: 'POST',
+      headers,
       body: formData,
       // Note: Don't set Content-Type header when using FormData
       // The browser will set it automatically with the correct boundary

@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { uploadToS3 } from '../services/s3Service';
+import LoginForm from '../components/auth/LoginForm';
 import './AdminPage.css';
 
 const AdminPage = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [authToken, setAuthToken] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState('');
@@ -10,6 +13,27 @@ const AdminPage = () => {
     title: '',
     tags: ''
   });
+
+  // Check for existing auth token on mount
+  useEffect(() => {
+    const token = localStorage.getItem('adminToken');
+    if (token) {
+      setAuthToken(token);
+      setIsAuthenticated(true);
+    }
+  }, []);
+
+  const handleLogin = (token) => {
+    setAuthToken(token);
+    setIsAuthenticated(true);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('adminToken');
+    setAuthToken(null);
+    setIsAuthenticated(false);
+    setUploadStatus('');
+  };
 
   const handleFileChange = (e) => {
     setSelectedFile(e.target.files[0]);
@@ -38,12 +62,22 @@ const AdminPage = () => {
       const formData = new FormData();
       formData.append('image', selectedFile); // Use 'image' to match Postman test
 
+      // Clean tags: remove # symbols if user added them
+      const cleanedMetadata = {
+        ...metadata,
+        tags: metadata.tags
+          .split(',')
+          .map(tag => tag.trim().replace(/^#+/, '')) // Remove leading # symbols
+          .filter(tag => tag.length > 0) // Remove empty tags
+          .join(',')
+      };
+
       // Append each metadata field separately
-      for (const key in metadata) {
-        formData.append(key, metadata[key]);
+      for (const key in cleanedMetadata) {
+        formData.append(key, cleanedMetadata[key]);
       }
 
-      await uploadToS3(formData);
+      await uploadToS3(formData, authToken);
       setUploadStatus('Upload successful!');
       // Reset form
       setSelectedFile(null);
@@ -60,9 +94,19 @@ const AdminPage = () => {
     }
   };
 
+  // Show login form if not authenticated
+  if (!isAuthenticated) {
+    return <LoginForm onLogin={handleLogin} />;
+  }
+
   return (
     <div className="admin-container">
-      <h1>Admin Dashboard</h1>
+      <div className="admin-header">
+        <h1>Admin Dashboard</h1>
+        <button onClick={handleLogout} className="logout-button">
+          Logout
+        </button>
+      </div>
       <div className="upload-section">
         <h2>Upload Image</h2>
         <form onSubmit={handleSubmit} className="upload-form">

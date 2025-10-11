@@ -10,6 +10,7 @@ const CakeCarousel = () => {
   const [cakes, setCakes] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState(null);
+  const [selectedCake, setSelectedCake] = React.useState(null);
 
   React.useEffect(() => {
     const fetchCakes = async () => {
@@ -110,17 +111,15 @@ const CakeCarousel = () => {
           <Slider {...settings}>
             {cakes.map(cake => (
               <div key={cake.id} className="cake-slide">
-                <div className="cake-card">
+                <div 
+                  className="cake-card"
+                  onClick={() => setSelectedCake(cake)}
+                  onDoubleClick={() => setSelectedCake(cake)}
+                  style={{ cursor: 'pointer' }}
+                >
                   <img src={cake.src} alt={cake.alt} className="cake-image" />
                   <div className="cake-info">
                     <h3 className="cake-name">{cake.name}</h3>
-                    {cake.tags && cake.tags.length > 0 && (
-                      <div className="cake-tags">
-                        {cake.tags.map(tag => (
-                          <span key={tag} className="cake-tag">#{tag}</span>
-                        ))}
-                      </div>
-                    )}
                   </div>
                 </div>
               </div>
@@ -133,6 +132,26 @@ const CakeCarousel = () => {
       <div className="section-footer">
         <NavLink to="/gallery" className="view-all-btn">View All Creations</NavLink>
       </div>
+      
+      {/* Modal for selected cake */}
+      {selectedCake && (
+        <div className="carousel-modal-overlay" onClick={() => setSelectedCake(null)}>
+          <div className="carousel-modal-content" onClick={e => e.stopPropagation()}>
+            <button className="carousel-modal-close" onClick={() => setSelectedCake(null)}>×</button>
+            <img src={selectedCake.src} alt={selectedCake.alt} className="carousel-modal-image" />
+            <div className="carousel-modal-info">
+              <h2>{selectedCake.name}</h2>
+              {selectedCake.tags && selectedCake.tags.length > 0 && (
+                <div className="carousel-modal-tags">
+                  {selectedCake.tags.map(tag => (
+                    <span key={tag} className="carousel-modal-tag">#{tag}</span>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 };

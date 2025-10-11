@@ -103,6 +103,195 @@ Lets not over complicated this and just go with option 3
 
 ---
 
+## 2025-10-11 22:27 (UTC+05:30)
+
+**Prompt:**
+```
+Good everything good so far, lets create a new branch for new changes
+```
+
+---
+
+## 2025-10-11 22:31 (UTC+05:30)
+
+**Prompt:**
+```
+I want to fix the authentication of admin page first. What are my options?
+```
+
+---
+
+## 2025-10-11 22:34 (UTC+05:30)
+
+**Prompt:**
+```
+Lets go with option 2 for now
+```
+
+---
+
+## 2025-10-11 22:50 (UTC+05:30)
+
+**Prompt:**
+```
+yes, lets test this locally first
+```
+
+---
+
+## 2025-10-11 22:53 (UTC+05:30)
+
+**Prompt:**
+```
+admin123 is not working when I use as password
+```
+
+---
+
+## 2025-10-11 23:01 (UTC+05:30)
+
+**Prompt:**
+```
+PLease stop all running front and backend server and check one more time snce the password does not seem to be working
+```
+
+---
+
+## 2025-10-11 23:25 (UTC+05:30)
+
+**Prompt:**
+```
+password seems to be working fine now
+```
+
+---
+
+## 2025-10-11 23:26 (UTC+05:30)
+
+**Prompt:**
+```
+I would like to change the passord now and checking and commit the code
+```
+
+---
+
+## 2025-10-11 23:37 (UTC+05:30)
+
+**Prompt:**
+```
+node generate-password-hash.js "Alka@1612!"
+```
+
+---
+
+## 2025-10-11 23:39 (UTC+05:30)
+
+**Prompt:**
+```
+PLease restart frontend and backend to test the new password
+```
+
+---
+
+## 2025-10-11 23:43 (UTC+05:30)
+
+**Prompt:**
+```
+New password does not work
+```
+
+---
+
+## 2025-10-12 00:01 (UTC+05:30)
+
+**Prompt:**
+```
+I want to try the login issue later but before thta, can you please add the"admin"  menu option also in the menu.
+```
+
+---
+
+## 2025-10-12 00:06 (UTC+05:30)
+
+**Prompt:**
+```
+lets generate password again
+```
+
+---
+
+## 2025-10-12 00:07 (UTC+05:30)
+
+**Prompt:**
+```
+restart backend
+```
+
+---
+
+## 2025-10-12 00:10 (UTC+05:30)
+
+**Prompt:**
+```
+Access to fetch at 'https://h9sqgvawk0.execute-api.ap-south-1.amazonaws.com/auth/login' from origin 'http://localhost:3000' has been blocked by CORS policy: Request header field content-type is not allowed by Access-Control-Allow-Headers in preflight response.
+```
+
+---
+
+## 2025-10-12 00:28 (UTC+05:30)
+
+**Prompt:**
+```
+All seems good except my favicon, it does not look good, can you find a a better neater favicon, please confirm with me before implementing
+```
+
+---
+
+## 2025-10-12 00:30 (UTC+05:30)
+
+**Prompt:**
+```
+Okay lets go with your recomendation
+```
+
+---
+
+## 2025-10-12 00:32 (UTC+05:30)
+
+**Prompt:**
+```
+OKay, please run the frontend app again so that I can see the changes
+```
+
+---
+
+## 2025-10-12 00:35 (UTC+05:30)
+
+**Prompt:**
+```
+Looks like something went wrong it is using default react favicon now
+```
+
+---
+
+## 2025-10-12 00:37 (UTC+05:30)
+
+**Prompt:**
+```
+it still points to old default react favicon even in incognito window, something is certainly wrong
+```
+
+---
+
+## 2025-10-12 00:41 (UTC+05:30)
+
+**Prompt:**
+```
+Now I do see the new favicon. However on the UI issue, there are 2 feedbacks, the carousel still shows very narrow images, use responsive design and on phones show just one image at a time. On long press/double click do open the image as pop up same as being done in gallery. Also do not show the tags in carousel. One minor comment, in the upload page ingore "#" if user adds them, and add it yourself, now in some cases we are having 2 "#"
+```
+
+---
+
 # Code Analysis Findings
 
 **Analysis Date:** 2025-10-11 21:18 (UTC+05:30)

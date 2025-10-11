@@ -20,7 +20,44 @@ exports.handler = async (event) => {
     'Access-Control-Max-Age': '86400',
   };
 
+  // Handle OPTIONS request for CORS
+  if (event.httpMethod === 'OPTIONS' || event.requestContext?.http?.method === 'OPTIONS') {
+    return {
+      statusCode: 200,
+      headers,
+      body: '',
+    };
+  }
+
   try {
+    // Check for authorization token
+    const authHeader = event.headers?.authorization || event.headers?.Authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return {
+        statusCode: 401,
+        headers,
+        body: JSON.stringify({
+          success: false,
+          message: 'Unauthorized: No valid authentication token provided',
+        }),
+      };
+    }
+
+    const token = authHeader.substring(7); // Remove 'Bearer ' prefix
+    
+    // Basic token validation (in production, verify JWT properly)
+    if (!token || token.length < 10) {
+      return {
+        statusCode: 401,
+        headers,
+        body: JSON.stringify({
+          success: false,
+          message: 'Unauthorized: Invalid token',
+        }),
+      };
+    }
+
+    console.log('Authentication successful, proceeding with upload');
     console.log('=== LAMBDA UPLOAD HANDLER START ===');
     console.log('Event received:', JSON.stringify(event, null, 2));
     console.log('Event headers:', JSON.stringify(event.headers, null, 2));

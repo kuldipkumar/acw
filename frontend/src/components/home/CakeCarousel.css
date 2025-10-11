@@ -25,36 +25,36 @@
 .carousel-container {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 0 2rem;
+  padding: 0 3rem;
 }
 
 @media (max-width: 768px) {
   .carousel-container {
-    padding: 0 1rem;
+    padding: 0 2rem;
   }
 }
 
 @media (max-width: 480px) {
   .carousel-container {
-    padding: 0 0.5rem;
+    padding: 0 1rem;
   }
 }
 
 .cake-slide {
-  padding: 0 0.75rem;
+  padding: 0 1rem;
   outline: none;
   box-sizing: border-box;
 }
 
 @media (max-width: 768px) {
   .cake-slide {
-    padding: 0 0.5rem;
+    padding: 0;
   }
 }
 
 @media (max-width: 480px) {
   .cake-slide {
-    padding: 0 0.25rem;
+    padding: 0;
   }
 }
 
@@ -430,5 +430,131 @@
   .view-all-btn {
     padding: 1rem 3rem;
     font-size: 1.2rem;
+  }
+}
+
+/* Modal Styles */
+.carousel-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 2rem;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.carousel-modal-content {
+  background: white;
+  border-radius: 20px;
+  max-width: 900px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.carousel-modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  transition: all 0.3s ease;
+  color: var(--primary-color);
+}
+
+.carousel-modal-close:hover {
+  background: white;
+  transform: rotate(90deg);
+}
+
+.carousel-modal-image {
+  width: 100%;
+  max-height: 70vh;
+  object-fit: contain;
+  display: block;
+  border-radius: 20px 20px 0 0;
+}
+
+.carousel-modal-info {
+  padding: 2rem;
+  text-align: center;
+}
+
+.carousel-modal-info h2 {
+  font-size: 2rem;
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+}
+
+.carousel-modal-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.carousel-modal-tag {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background-color: var(--accent-color);
+  color: white;
+  border-radius: 20px;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .carousel-modal-overlay {
+    padding: 1rem;
+  }
+  
+  .carousel-modal-info {
+    padding: 1.5rem;
+  }
+  
+  .carousel-modal-info h2 {
+    font-size: 1.5rem;
+  }
+  
+  .carousel-modal-tag {
+    font-size: 0.9rem;
+    padding: 0.4rem 0.8rem;
   }
 }
