@@ -43,15 +43,51 @@ const CakeCarousel = () => {
     speed: 500,
     slidesToShow: 3,
     slidesToScroll: 1,
-    centerMode: true,
+    centerMode: false,
     autoplay: true,
     autoplaySpeed: 3000,
     arrows: true,
     nextArrow: <NextArrow />,
     prevArrow: <PrevArrow />,
     responsive: [
-      { breakpoint: 1200, settings: { slidesToShow: 2 } },
-      { breakpoint: 768, settings: { slidesToShow: 1 } },
+      {
+        breakpoint: 1400,
+        settings: {
+          slidesToShow: 3,
+          slidesToScroll: 1,
+          centerMode: false,
+          arrows: true,
+        }
+      },
+      {
+        breakpoint: 1024,
+        settings: {
+          slidesToShow: 2,
+          slidesToScroll: 1,
+          centerMode: false,
+          arrows: true,
+        }
+      },
+      {
+        breakpoint: 768,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+          centerMode: false,
+          arrows: false,
+          dots: true,
+        }
+      },
+      {
+        breakpoint: 480,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+          centerMode: false,
+          arrows: false,
+          dots: true,
+        }
+      },
     ],
   };
 
@@ -78,7 +114,13 @@ const CakeCarousel = () => {
                   <img src={cake.src} alt={cake.alt} className="cake-image" />
                   <div className="cake-info">
                     <h3 className="cake-name">{cake.name}</h3>
-                    <p className="cake-description">{cake.description}</p>
+                    {cake.tags && cake.tags.length > 0 && (
+                      <div className="cake-tags">
+                        {cake.tags.map(tag => (
+                          <span key={tag} className="cake-tag">#{tag}</span>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

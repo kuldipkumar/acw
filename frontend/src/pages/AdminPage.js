@@ -8,8 +8,6 @@ const AdminPage = () => {
   const [uploadStatus, setUploadStatus] = useState('');
   const [metadata, setMetadata] = useState({
     title: '',
-    description: '',
-    category: '',
     tags: ''
   });
 
@@ -51,8 +49,6 @@ const AdminPage = () => {
       setSelectedFile(null);
       setMetadata({
         title: '',
-        description: '',
-        category: '',
         tags: ''
       });
       document.getElementById('file-upload').value = '';
@@ -96,28 +92,6 @@ const AdminPage = () => {
           </div>
 
           <div className="form-group">
-            <label>Description:</label>
-            <textarea
-              name="description"
-              value={metadata.description}
-              onChange={handleMetadataChange}
-              className="form-control"
-              rows="3"
-            />
-          </div>
-
-          <div className="form-group">
-            <label>Category:</label>
-            <input
-              type="text"
-              name="category"
-              value={metadata.category}
-              onChange={handleMetadataChange}
-              className="form-control"
-            />
-          </div>
-
-          <div className="form-group">
             <label>Tags (comma separated):</label>
             <input
               type="text"
@@ -125,7 +99,8 @@ const AdminPage = () => {
               value={metadata.tags}
               onChange={handleMetadataChange}
               className="form-control"
-              placeholder="e.g., birthday, cake, chocolate"
+              placeholder="e.g., birthday, chocolate, wedding"
+              required
             />
           </div>
 

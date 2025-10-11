@@ -33,9 +33,6 @@ const GalleryPage = () => {
           if (cake.tags && Array.isArray(cake.tags)) {
             cake.tags.forEach(tag => uniqueTags.add(tag));
           }
-          if (cake.category) {
-            uniqueTags.add(cake.category);
-          }
         });
         setAllTags(Array.from(uniqueTags));
         
@@ -56,9 +53,7 @@ const GalleryPage = () => {
       setFilteredCakes(cakes);
     } else {
       const filtered = cakes.filter(cake => {
-        const matchesTag = cake.tags && cake.tags.includes(activeFilter);
-        const matchesCategory = cake.category === activeFilter;
-        return matchesTag || matchesCategory;
+        return cake.tags && cake.tags.includes(activeFilter);
       });
       setFilteredCakes(filtered);
     }
@@ -118,7 +113,6 @@ const GalleryPage = () => {
               <img src={cake.src} alt={cake.alt} className="gallery-image" />
               <div className="gallery-overlay">
                 <h3 className="gallery-cake-name">{cake.name}</h3>
-                <p className="gallery-cake-description">{cake.description}</p>
                 {cake.tags && cake.tags.length > 0 && (
                   <div className="gallery-tags">
                     {cake.tags.map(tag => (
@@ -146,13 +140,8 @@ const GalleryPage = () => {
             <img src={selectedCake.src} alt={selectedCake.alt} className="modal-image" />
             <div className="modal-info">
               <h2>{selectedCake.name}</h2>
-              <p>{selectedCake.description}</p>
-              {selectedCake.category && (
-                <p><strong>Category:</strong> {selectedCake.category}</p>
-              )}
               {selectedCake.tags && selectedCake.tags.length > 0 && (
                 <div className="modal-tags">
-                  <strong>Tags:</strong>
                   {selectedCake.tags.map(tag => (
                     <span key={tag} className="modal-tag">#{tag}</span>
                   ))}
