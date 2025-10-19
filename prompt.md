@@ -292,6 +292,33 @@ Now I do see the new favicon. However on the UI issue, there are 2 feedbacks, th
 
 ---
 
+## 2025-10-12 00:45 (UTC+05:30)
+
+**Prompt:**
+```
+All good, lets commit code, merge branch and deploy on AWS
+```
+
+---
+
+## 2025-10-12 11:02 (UTC+05:30)
+
+**Prompt:**
+```
+Now when the code is deployed on AWS and I tried to access the admin screen using password, it does not work, it may be because I added ADMIN_PASSWORD_HASH in github secrets later on
+```
+
+---
+
+## 2025-10-12 11:16 (UTC+05:30)
+
+**Prompt:**
+```
+Yes, Please help create a deployment script, I would not want to do all of this manually.
+```
+
+---
+
 # Code Analysis Findings
 
 **Analysis Date:** 2025-10-11 21:18 (UTC+05:30)

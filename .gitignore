@@ -42,3 +42,4 @@ frontend/node_modules
 # backend specific
 backend/node_modules
 .env
+backend/.deploy/
