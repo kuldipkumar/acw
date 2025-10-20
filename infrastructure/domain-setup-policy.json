@@ -1,0 +1,29 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "CloudFrontManagement",
+            "Effect": "Allow",
+            "Action": [
+                "cloudfront:ListDistributions",
+                "cloudfront:GetDistribution",
+                "cloudfront:GetDistributionConfig",
+                "cloudfront:UpdateDistribution",
+                "cloudfront:CreateInvalidation"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "ACMCertificateManagement",
+            "Effect": "Allow",
+            "Action": [
+                "acm:RequestCertificate",
+                "acm:DescribeCertificate",
+                "acm:ListCertificates",
+                "acm:GetCertificate",
+                "acm:DeleteCertificate"
+            ],
+            "Resource": "*"
+        }
+    ]
+}

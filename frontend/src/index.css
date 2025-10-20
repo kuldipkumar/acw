@@ -60,10 +60,14 @@ body::before {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  position: relative;
+  z-index: 1;
 }
 
 main {
   flex: 1;
+  position: relative;
+  z-index: 1;
   /* Padding is removed to allow for full-width sections */
 }
 
