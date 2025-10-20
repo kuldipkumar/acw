@@ -7,18 +7,32 @@ const heroImage = 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?
 const HeroSection = () => {
   return (
     <section className="hero-section">
+      <div className="diwali-banner">
+        <div className="diya-icon">🪔</div>
+        <span className="diwali-text">Happy Diwali!</span>
+        <div className="sparkle">✨</div>
+        <span className="anniversary-text">Celebrating 5 Years of Sweetness</span>
+        <div className="sparkle">✨</div>
+        <div className="diya-icon">🪔</div>
+      </div>
       <div className="hero-content">
         <h1 className="hero-title">
-          <span>ARTISTRY IN</span>
-          <span>EVERY BITE.</span>
+          <span className="golden-text">ARTISTRY IN</span>
+          <span className="golden-text">EVERY BITE.</span>
         </h1>
         <p className="hero-subtitle">
-          Experience custom cakes crafted with passion, precision, and the finest ingredients.
+          Celebrating 5 glorious years of crafting custom cakes with passion, precision, and the finest ingredients. 
+          This Diwali, let us add sweetness to your festivities!
         </p>
-        <button className="hero-cta-btn">Explore Our Creations</button>
+        <div className="hero-buttons">
+          <button className="hero-cta-btn primary">Explore Our Creations</button>
+          <button className="hero-cta-btn secondary">Diwali Special</button>
+        </div>
       </div>
       <div className="hero-image-container">
-        <img src={heroImage} alt="Exquisite CakeWalk Creation" className="hero-main-image" />
+        <div className="image-glow">
+          <img src={heroImage} alt="Exquisite CakeWalk Creation" className="hero-main-image" />
+        </div>
       </div>
     </section>
   );
