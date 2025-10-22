@@ -4,14 +4,14 @@
 :root {
   --primary-color: #1a1a1a; /* Deep black */
   --secondary-color: #0a0a0a; /* Pure black */
-  --accent-color: #d4af37; /* Rich gold */
-  --accent-hover-color: #b8941f; /* Darker gold for hover */
+  --accent-color: #FFD700; /* True gold */
+  --accent-hover-color: #FFA500; /* Orange gold for hover */
   --background-color: #0f0f0f; /* Dark background */
-  --primary-gold: #d4af37; /* Main gold */
-  --light-gold: #f4e4b8; /* Light gold */
-  --deep-gold: #b8941f; /* Deep gold */
-  --diwali-orange: #ff6b35; /* Festive orange */
-  --diwali-red: #c41e3a; /* Festive red */
+  --primary-gold: #FFD700; /* Main gold */
+  --light-gold: #E8D5B7; /* Light gold */
+  --deep-gold: #FFA500; /* Deep orange gold */
+  --diwali-orange: #FFA500; /* Festive orange */
+  --diwali-red: #FF4500; /* Festive red */
 }
 
 * {
