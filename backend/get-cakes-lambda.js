@@ -55,8 +55,10 @@ exports.handler = async (event) => {
           originalname: metadata.originalname || item.Key,
           alt: `Image of ${metadata.title || item.Key}`,
           src: url,
+          url: url,
           lastModified: item.LastModified,
           size: item.Size,
+          isLandingImage: metadata.islandingimage === 'true',
         };
       } catch (error) {
         console.error(`Error processing ${item.Key}:`, error);
@@ -71,8 +73,10 @@ exports.handler = async (event) => {
           originalname: item.Key,
           alt: `Image of ${item.Key}`,
           src: url,
+          url: url,
           lastModified: item.LastModified,
           size: item.Size,
+          isLandingImage: false,
         };
       }
     });

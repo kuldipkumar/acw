@@ -1,4 +1,4 @@
-const { S3Client, CopyObjectCommand, HeadObjectCommand } = require('@aws-sdk/client-s3');
+const { S3Client, CopyObjectCommand, HeadObjectCommand, ListObjectsV2Command } = require('@aws-sdk/client-s3');
 
 const BUCKET_NAME = process.env.S3_BUCKET_NAME || 'cakewalkbucket2';
 const REGION = process.env.AWS_REGION || 'ap-south-1';
@@ -19,7 +19,44 @@ exports.handler = async (event) => {
 
   try {
     const imageId = event.pathParameters.id;
-    const { title, description, category, tags } = JSON.parse(event.body);
+    const { title, description, category, tags, isLandingImage } = JSON.parse(event.body);
+
+    // If setting this image as landing image, unset all other images first
+    if (isLandingImage === true) {
+      const listCommand = new ListObjectsV2Command({ Bucket: BUCKET_NAME });
+      const { Contents } = await s3Client.send(listCommand);
+      
+      if (Contents) {
+        for (const item of Contents) {
+          if (item.Key !== imageId) {
+            try {
+              const headCmd = new HeadObjectCommand({ Bucket: BUCKET_NAME, Key: item.Key });
+              const { Metadata: itemMetadata } = await s3Client.send(headCmd);
+              
+              // Only update if it was previously set as landing image
+              if (itemMetadata && itemMetadata.islandingimage === 'true') {
+                const updatedMetadata = {
+                  ...itemMetadata,
+                  islandingimage: 'false'
+                };
+                
+                const copyCmd = new CopyObjectCommand({
+                  Bucket: BUCKET_NAME,
+                  CopySource: `${BUCKET_NAME}/${item.Key}`,
+                  Key: item.Key,
+                  Metadata: updatedMetadata,
+                  MetadataDirective: 'REPLACE',
+                });
+                
+                await s3Client.send(copyCmd);
+              }
+            } catch (err) {
+              console.error(`Error updating ${item.Key}:`, err);
+            }
+          }
+        }
+      }
+    }
 
     // Fetch existing metadata to preserve other fields
     const headCommand = new HeadObjectCommand({ Bucket: BUCKET_NAME, Key: imageId });
@@ -31,6 +68,7 @@ exports.handler = async (event) => {
       description: description || existingMetadata.description || '',
       category: category || existingMetadata.category || '',
       tags: tags ? (Array.isArray(tags) ? tags.join(',') : tags) : existingMetadata.tags || '',
+      islandingimage: isLandingImage !== undefined ? String(isLandingImage) : existingMetadata.islandingimage || 'false',
     };
 
     const copyCommand = new CopyObjectCommand({
