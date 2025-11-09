@@ -1,28 +1,12 @@
 .footer {
-  background: linear-gradient(180deg, #000000 0%, #0a0a0a 100%);
-  color: #E8D5B7;
-  padding: 3rem 0 1rem;
-  margin-top: 2rem;
-  border-top: 2px solid rgba(255, 215, 0, 0.3);
-  box-shadow: 0 -4px 20px rgba(255, 215, 0, 0.1);
+  background: #FAFAFA;
+  color: var(--text-color);
+  padding: 3rem 0 1.5rem;
+  margin-top: 3rem;
+  border-top: 1px solid var(--border-color);
   position: relative;
 }
 
-.footer::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, #FFD700, transparent);
-  animation: shimmerLine 3s ease-in-out infinite;
-}
-
-@keyframes shimmerLine {
-  0%, 100% { opacity: 0.3; }
-  50% { opacity: 1; }
-}
 
 .footer-content {
   display: grid;
@@ -39,27 +23,17 @@
 }
 
 .brand-name-footer {
-  font-size: 2.2rem;
-  font-weight: 700;
-  background: linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FFD700 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  background-size: 200% auto;
-  animation: goldShine 3s ease-in-out infinite;
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: var(--text-color);
   margin-bottom: 1rem;
-}
-
-@keyframes goldShine {
-  0% { background-position: 0% center; }
-  50% { background-position: 100% center; }
-  100% { background-position: 0% center; }
+  letter-spacing: -0.5px;
 }
 
 .brand-tagline {
   font-size: 1rem;
   line-height: 1.6;
-  color: var(--light-gold);
+  color: var(--light-text);
   margin-bottom: 1.5rem;
   opacity: 0.9;
 }
@@ -70,17 +44,17 @@
 }
 
 .footer-socials a {
-  width: 40px;
-  height: 40px;
-  background: linear-gradient(135deg, #FFD700, #FFA500);
-  color: #000000;
+  width: 38px;
+  height: 38px;
+  background: var(--primary-color);
+  color: #FFFFFF;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+  box-shadow: 0 2px 8px rgba(244, 166, 184, 0.2);
   position: relative;
   overflow: hidden;
 }
@@ -101,16 +75,19 @@
 }
 
 .footer-socials a:hover {
-  transform: translateY(-4px) scale(1.1);
-  box-shadow: 0 6px 25px rgba(255, 215, 0, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(244, 166, 184, 0.3);
+  background: var(--secondary-color);
 }
 
 .footer-section h3 {
-  color: #FFD700;
-  font-size: 1.3rem;
-  font-weight: 700;
-  margin-bottom: 1.5rem;
-  text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+  color: var(--text-color);
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 1.2rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 0.9rem;
 }
 
 .footer-section ul {
@@ -124,7 +101,7 @@
 }
 
 .footer-section ul li a {
-  color: var(--light-gold);
+  color: var(--light-text);
   text-decoration: none;
   transition: all 0.3s ease;
   font-size: 1rem;
@@ -133,9 +110,8 @@
 
 .footer-section ul li a:hover,
 .footer-section ul li a.active {
-  color: #FFD700;
+  color: var(--primary-color);
   opacity: 1;
-  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
   transform: translateX(5px);
   display: inline-block;
 }
@@ -150,27 +126,26 @@
   display: flex;
   align-items: center;
   gap: 0.8rem;
-  color: var(--light-gold);
+  color: var(--light-text);
   opacity: 0.9;
 }
 
 .contact-item i {
-  color: #FFD700;
+  color: var(--primary-color);
   width: 18px;
   text-align: center;
-  filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.5));
 }
 
 .footer-bottom {
   text-align: center;
   padding: 2rem 0 1rem;
-  border-top: 1px solid rgba(255, 215, 0, 0.2);
+  border-top: 1px solid var(--border-color);
   margin-top: 2rem;
 }
 
 .footer-bottom p {
   margin: 0.5rem 0;
-  color: var(--light-gold);
+  color: var(--light-text);
   opacity: 0.7;
 }
 
@@ -179,13 +154,7 @@
 }
 
 .footer-credit i {
-  color: var(--diwali-red);
-  animation: heartbeat 1.5s ease-in-out infinite;
-}
-
-@keyframes heartbeat {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.1); }
+  color: #FF4500;
 }
 
 /* Responsive Design */

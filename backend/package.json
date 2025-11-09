@@ -4,7 +4,7 @@
   "description": "Lambda function for Alka's Cake Walk website.",
   "main": "get-cakes-lambda.js",
   "scripts": {
-    "test": "node test-lambda.js"
+    "test": "jest"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.525.0",
@@ -18,5 +18,10 @@
     "lambda-multipart-parser": "^1.0.1",
     "multer": "^2.0.2",
     "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "aws-sdk-client-mock": "^4.1.0",
+    "jest": "^30.2.0",
+    "supertest": "^7.1.4"
   }
 }

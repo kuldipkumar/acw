@@ -102,10 +102,6 @@ const CakeCarousel = () => {
 
   return (
     <section className="carousel-section">
-      <div className="section-header">
-        <h2 className="section-title">Cravings for Every Celebration</h2>
-        <p className="section-subtitle">Discover our handcrafted cakes, made with love and the finest ingredients.</p>
-      </div>
       <div className="carousel-container">
         {cakes.length > 0 ? (
           <Slider {...settings}>

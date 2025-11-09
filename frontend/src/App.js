@@ -21,7 +21,7 @@ function App() {
             <Route path="/gallery" element={<GalleryPage />} />
             <Route path="/contact" element={<ContactPage />} />
             <Route path="/admin" element={<AdminPage />} />
-          </Routes>
+                      </Routes>
         </main>
         <Footer />
         <ThemeSwitcher />

@@ -1,56 +1,54 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
 import './HeroSection.css';
 
-// Hero image - elegant single image (will be moved to S3 in future)
-const heroImage = 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?q=80&w=2089&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
+// Fallback hero image if S3 fetch fails
+const fallbackHeroImage = 'https://images.unsplash.com/photo-1535254973040-607b474cb50d?q=80&w=2000&auto=format&fit=crop';
 
 const HeroSection = () => {
-  const navigate = useNavigate();
+  const [heroImage, setHeroImage] = useState(fallbackHeroImage);
 
-  const handleExploreClick = () => {
-    navigate('/gallery');
-  };
+  useEffect(() => {
+    const fetchImages = async () => {
+      try {
+        const baseUrl = process.env.REACT_APP_API_BASE_URL;
+        const response = await fetch(`${baseUrl}/cakes`);
+        if (!response.ok) throw new Error('Failed to fetch images');
+        const data = await response.json();
+        
+        if (data && data.length > 0) {
+          // Find image marked as landing image
+          const landingImage = data.find(cake => cake.isLandingImage === true);
+          
+          if (landingImage) {
+            setHeroImage(landingImage.url);
+          } else {
+            // Fallback to first image if no landing image is set
+            setHeroImage(data[0].url);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching images:', error);
+        // Keep fallback image
+      }
+    };
+    fetchImages();
+  }, []);
 
   return (
     <section className="hero-section">
-      {/* Elegant Diwali Banner */}
-      <div className="diwali-banner">
-        <div className="banner-content">
-          <div className="banner-icon">🪔</div>
-          <div className="banner-text-group">
-            <h2 className="banner-greeting">Happy Diwali</h2>
-            <p className="banner-milestone">Celebrating 5 Years of Sweetness</p>
-          </div>
-          <div className="banner-icon">🪔</div>
-        </div>
+      {/* Large Hero Image */}
+      <div className="hero-image-wrapper">
+        <img src={heroImage} alt="Exquisite CakeWalk Creation" className="hero-featured-image" />
       </div>
-
-      {/* Hero Content Container */}
-      <div className="hero-main-content">
-        <div className="hero-content">
-          <h1 className="hero-title">
-            <span className="golden-text">ARTISTRY IN</span>
-            <span className="golden-text">EVERY BITE.</span>
-          </h1>
-          <p className="hero-subtitle">
-            Celebrating 5 glorious years of crafting custom cakes with passion, precision, and the finest ingredients. 
-            This Diwali, let us add sweetness to your festivities!
-          </p>
-          <div className="hero-buttons">
-            <button className="hero-cta-btn primary" onClick={handleExploreClick}>
-              Explore Our Creations
-            </button>
-            <button className="hero-cta-btn secondary" disabled>
-              Diwali Special
-            </button>
-          </div>
-        </div>
-        <div className="hero-image-container">
-          <div className="image-glow">
-            <img src={heroImage} alt="Exquisite CakeWalk Creation" className="hero-main-image" />
-          </div>
-        </div>
+      
+      {/* Hero Content Below Image */}
+      <div className="hero-content-center">
+        <h1 className="hero-title">
+          <span className="hero-title-main">Artistry in Every Bite</span>
+        </h1>
+        <p className="hero-subtitle">
+          Celebrating 5 glorious years of crafting custom cakes with passion, precision, and the finest ingredients.
+        </p>
       </div>
     </section>
   );

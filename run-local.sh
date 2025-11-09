@@ -9,6 +9,9 @@
 
 set -euo pipefail
 
+# Ensure common Node.js paths are available
+export PATH="/usr/local/bin:$PATH"
+
 ROOT_DIR="$(cd "$(dirname "$0")" && pwd)"
 BACKEND_DIR="$ROOT_DIR/backend"
 FRONTEND_DIR="$ROOT_DIR/frontend"
@@ -26,8 +29,10 @@ if [ -f "$BACKEND_DIR/.env" ]; then
   info "Loading backend environment from backend/.env"
   # export all variables defined in .env
   set -a
+  set +u  # Temporarily disable unbound variable check
   # shellcheck disable=SC1091
   source "$BACKEND_DIR/.env"
+  set -u  # Re-enable unbound variable check
   set +a
 fi
 
@@ -39,6 +44,9 @@ info "Starting backend (port ${PORT:-3001})..."
 ) &
 BACKEND_PID=$!
 info "Backend started with PID $BACKEND_PID"
+
+# Give backend a moment to fully start
+sleep 2
 
 # Ensure frontend deps
 if [ ! -d "$FRONTEND_DIR/node_modules" ]; then
@@ -61,4 +69,7 @@ trap cleanup EXIT INT TERM
 # Start CRA dev server (blocks until user stops)
 info "Starting frontend (port 3000)..."
 cd "$FRONTEND_DIR"
-npm start
+# Disable browser auto-open and skip preflight check
+# Unset PORT so frontend uses default 3000 (backend already uses 3001)
+unset PORT
+BROWSER=none SKIP_PREFLIGHT_CHECK=true npm start

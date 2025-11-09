@@ -298,8 +298,10 @@ app.get('/api/cakes', async (req, res) => {
           originalname: metadata.originalname || item.Key,
           alt: `Image of ${metadata.title || item.Key}`,
           src: signedUrl,
+          url: signedUrl,
           lastModified: item.LastModified,
           size: item.Size,
+          isLandingImage: metadata.islandingimage === 'true',
         };
       } catch (error) {
         console.error(`Error processing ${item.Key}:`, error);
@@ -324,6 +326,92 @@ app.get('/api/cakes', async (req, res) => {
   } catch (error) {
     console.error('Error listing cakes:', error);
     res.status(500).json({ message: 'Failed to fetch cakes' });
+  }
+});
+
+// Update cake metadata endpoint
+app.put('/api/cakes/:id', authenticateToken, async (req, res) => {
+  console.log(`PUT /api/cakes/${req.params.id} request received`);
+  try {
+    if (!HAS_AWS) {
+      return res.status(503).json({
+        success: false,
+        message: 'Metadata updates are disabled: missing AWS credentials on the server.'
+      });
+    }
+
+    const { title, description, category, tags, isLandingImage } = req.body;
+
+    // First, get the existing metadata to preserve fields not being updated
+    const headParams = {
+      Bucket: BUCKET_NAME,
+      Key: req.params.id,
+    };
+    const headObject = await s3.headObject(headParams).promise();
+    const existingMetadata = headObject.Metadata || {};
+
+    // If setting this image as landing image, we need to unset all other images first
+    if (isLandingImage === true) {
+      const list = await s3.listObjectsV2({ Bucket: BUCKET_NAME }).promise();
+      const contents = list.Contents || [];
+      
+      // Unset isLandingImage for all other images
+      for (const item of contents) {
+        if (item.Key !== req.params.id) {
+          try {
+            const head = await s3.headObject({ Bucket: BUCKET_NAME, Key: item.Key }).promise();
+            const itemMetadata = head.Metadata || {};
+            
+            // Only update if it was previously set as landing image
+            if (itemMetadata.islandingimage === 'true') {
+              const updatedMetadata = {
+                ...itemMetadata,
+                islandingimage: 'false'
+              };
+              
+              await s3.copyObject({
+                Bucket: BUCKET_NAME,
+                CopySource: `${BUCKET_NAME}/${item.Key}`,
+                Key: item.Key,
+                Metadata: updatedMetadata,
+                MetadataDirective: 'REPLACE',
+                ContentType: head.ContentType
+              }).promise();
+            }
+          } catch (err) {
+            console.error(`Error updating ${item.Key}:`, err);
+          }
+        }
+      }
+    }
+
+    // Prepare the new metadata
+    const newMetadata = {
+      ...existingMetadata,
+      title: title !== undefined ? title : existingMetadata.title || '',
+      description: description !== undefined ? description : existingMetadata.description || '',
+      category: category !== undefined ? category : existingMetadata.category || '',
+      tags: tags !== undefined ? (Array.isArray(tags) ? tags.join(',') : tags) : existingMetadata.tags || '',
+      islandingimage: isLandingImage !== undefined ? String(isLandingImage) : existingMetadata.islandingimage || 'false',
+    };
+
+    // Copy the object to update its metadata
+    const copyParams = {
+      Bucket: BUCKET_NAME,
+      CopySource: `${BUCKET_NAME}/${req.params.id}`,
+      Key: req.params.id,
+      Metadata: newMetadata,
+      MetadataDirective: 'REPLACE',
+      ContentType: headObject.ContentType, // Preserve the content type
+    };
+
+    await s3.copyObject(copyParams).promise();
+
+    res.json({ success: true, message: 'Metadata updated successfully' });
+
+  } catch (error) {
+    console.error(`Error updating metadata for ${req.params.id}:`, error);
+    res.status(500).json({ message: 'Failed to update metadata' });
   }
 });
 

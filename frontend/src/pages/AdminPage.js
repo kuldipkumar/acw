@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { uploadToS3 } from '../services/s3Service';
-import LoginForm from '../components/auth/LoginForm';
+import GalleryPage from './GalleryPage'; // We will reuse the gallery page component
 import './AdminPage.css';
 
 const AdminPage = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [authToken, setAuthToken] = useState(null);
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState('upload');
+
   const [selectedFile, setSelectedFile] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState('');
@@ -23,9 +28,33 @@ const AdminPage = () => {
     }
   }, []);
 
-  const handleLogin = (token) => {
-    setAuthToken(token);
-    setIsAuthenticated(true);
+    const handleLogin = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || 'Login failed');
+      }
+
+      localStorage.setItem('adminToken', data.token);
+      setAuthToken(data.token);
+      setIsAuthenticated(true);
+
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleLogout = () => {
@@ -94,9 +123,28 @@ const AdminPage = () => {
     }
   };
 
-  // Show login form if not authenticated
-  if (!isAuthenticated) {
-    return <LoginForm onLogin={handleLogin} />;
+    if (!isAuthenticated) {
+    return (
+      <div className="admin-container login-form-container">
+        <h2>Admin Login</h2>
+        <form onSubmit={handleLogin}>
+          <div className="form-group">
+            <label htmlFor="password">Password</label>
+            <input
+              type="password"
+              id="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+          {error && <p className="error-message">{error}</p>}
+          <button type="submit" disabled={loading}>
+            {loading ? 'Logging in...' : 'Login'}
+          </button>
+        </form>
+      </div>
+    );
   }
 
   return (
@@ -107,62 +155,64 @@ const AdminPage = () => {
           Logout
         </button>
       </div>
-      <div className="upload-section">
-        <h2>Upload Image</h2>
-        <form onSubmit={handleSubmit} className="upload-form">
-          
-          <div className="form-group">
-            <label>Image File:</label>
-            <input
-              id="file-upload"
-              type="file"
-              onChange={handleFileChange}
-              accept="image/*"
-              className="form-control"
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label>Title:</label>
-            <input
-              type="text"
-              name="title"
-              value={metadata.title}
-              onChange={handleMetadataChange}
-              className="form-control"
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label>Tags (comma separated):</label>
-            <input
-              type="text"
-              name="tags"
-              value={metadata.tags}
-              onChange={handleMetadataChange}
-              className="form-control"
-              placeholder="e.g., birthday, chocolate, wedding"
-              required
-            />
-          </div>
-
-          <button 
-            type="submit" 
-            className="upload-button"
-            disabled={isUploading}
-          >
-            {isUploading ? 'Uploading...' : 'Upload'}
-          </button>
-          
-          {uploadStatus && (
-            <div className={`status-message ${uploadStatus.includes('failed') ? 'error' : 'success'}`}>
-              {uploadStatus}
-            </div>
-          )}
-        </form>
+      <div className="admin-tabs">
+        <button className={`tab-btn ${activeTab === 'upload' ? 'active' : ''}`} onClick={() => setActiveTab('upload')}>Upload</button>
+        <button className={`tab-btn ${activeTab === 'gallery' ? 'active' : ''}`} onClick={() => setActiveTab('gallery')}>Manage Gallery</button>
       </div>
+      {activeTab === 'upload' ? (
+        <div className="upload-section">
+          <h2>Upload Image</h2>
+          <form onSubmit={handleSubmit} className="upload-form">
+            <div className="form-group">
+              <label>Image File:</label>
+              <input
+                id="file-upload"
+                type="file"
+                onChange={handleFileChange}
+                accept="image/*"
+                className="form-control"
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label>Title:</label>
+              <input
+                type="text"
+                name="title"
+                value={metadata.title}
+                onChange={handleMetadataChange}
+                className="form-control"
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label>Tags (comma separated):</label>
+              <input
+                type="text"
+                name="tags"
+                value={metadata.tags}
+                onChange={handleMetadataChange}
+                className="form-control"
+                placeholder="e.g., birthday, chocolate, wedding"
+                required
+              />
+            </div>
+            <button type="submit" className="upload-button" disabled={isUploading}>
+              {isUploading ? 'Uploading...' : 'Upload'}
+            </button>
+            {uploadStatus && (
+              <div className={`status-message ${uploadStatus.includes('failed') ? 'error' : 'success'}`}>
+                {uploadStatus}
+              </div>
+            )}
+          </form>
+        </div>
+      ) : (
+        <div className="manage-gallery-section">
+          <h2>Manage Gallery</h2>
+          <GalleryPage isAdminMode={true} />
+        </div>
+      )}
     </div>
   );
 };

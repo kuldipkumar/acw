@@ -2,17 +2,16 @@
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css');
 
 :root {
-  --primary-color: #1a1a1a; /* Deep black */
-  --secondary-color: #0a0a0a; /* Pure black */
-  --accent-color: #FFD700; /* True gold */
-  --accent-hover-color: #FFA500; /* Orange gold for hover */
-  --background-color: #0f0f0f; /* Dark background */
-  --primary-gold: #FFD700; /* Main gold */
-  --light-gold: #E8D5B7; /* Light gold */
-  --deep-gold: #FFA500; /* Deep orange gold */
-  --diwali-orange: #FFA500; /* Festive orange */
-  --diwali-red: #FF4500; /* Festive red */
-}
+  --primary-color: #F4A6B8; /* Soft coral pink */
+  --secondary-color: #E89BAC; /* Muted rose */
+  --accent-color: #F4A6B8; /* Soft pink accent */
+  --accent-hover-color: #E89BAC; /* Darker rose for hover */
+  --background-color: #FFFFFF; /* Pure white background */
+  --text-color: #2C2C2C; /* Soft black text */
+  --light-text: #7A7A7A; /* Medium gray text */
+  --border-color: #F0F0F0; /* Very light border */
+  --card-shadow: 0 2px 12px rgba(0, 0, 0, 0.08); /* Soft shadow */
+  }
 
 * {
   margin: 0;
@@ -21,40 +20,17 @@
 }
 
 body {
-  font-family: 'Clash Display', sans-serif;
+  font-family: 'Clash Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0f0f0f 100%);
-  color: var(--light-gold);
-  line-height: 1.6;
+  background: #FFFFFF;
+  color: var(--text-color);
+  line-height: 1.7;
   overflow-x: hidden;
   position: relative;
+  letter-spacing: 0.3px;
 }
 
-/* Diwali sparkle effect */
-body::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-image: 
-    radial-gradient(2px 2px at 20% 30%, rgba(212, 175, 55, 0.3), transparent),
-    radial-gradient(2px 2px at 60% 70%, rgba(255, 107, 53, 0.2), transparent),
-    radial-gradient(1px 1px at 50% 50%, rgba(212, 175, 55, 0.2), transparent),
-    radial-gradient(1px 1px at 80% 10%, rgba(196, 30, 58, 0.2), transparent),
-    radial-gradient(2px 2px at 90% 60%, rgba(212, 175, 55, 0.2), transparent);
-  background-size: 200% 200%;
-  animation: sparkle 20s ease-in-out infinite;
-  pointer-events: none;
-  z-index: 0;
-}
-
-@keyframes sparkle {
-  0%, 100% { opacity: 0.3; }
-  50% { opacity: 0.6; }
-}
 
 .App {
   display: flex;

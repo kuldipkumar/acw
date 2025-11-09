@@ -3,12 +3,12 @@
   justify-content: space-between;
   align-items: center;
   padding: 1rem 5%;
-  background: linear-gradient(180deg, #000000 0%, #1a1a1a 100%);
-  border-bottom: 2px solid rgba(255, 215, 0, 0.3);
+  background: #FFFFFF;
+  border-bottom: 1px solid var(--border-color);
   position: sticky;
   top: 0;
   z-index: 1000;
-  box-shadow: 0 4px 20px rgba(255, 215, 0, 0.1);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
   backdrop-filter: blur(10px);
 }
 
@@ -17,7 +17,7 @@
 }
 
 .logo {
-  height: 80px;
+  height: 60px;
 }
 
 .main-nav {
@@ -35,9 +35,11 @@
 
 .main-nav ul li a {
   text-decoration: none;
-  color: var(--light-gold);
-  font-weight: 600;
-  font-size: 1.2rem;
+  color: var(--text-color);
+  font-weight: 500;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
   position: relative;
   padding-bottom: 5px;
   transition: all 0.3s ease;
@@ -49,10 +51,9 @@
   bottom: 0;
   left: 0;
   width: 0;
-  height: 3px;
-  background: linear-gradient(90deg, #FFD700, #FFA500);
+  height: 2px;
+  background: var(--primary-color);
   transition: width 0.3s ease;
-  box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
 }
 
 .main-nav ul li a.active::after,
@@ -61,8 +62,7 @@
 }
 
 .main-nav ul li a:hover {
-  color: #FFD700;
-  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+  color: var(--primary-color);
 }
 
 .header-actions {
@@ -85,22 +85,23 @@
 }
 
 .social-icons a:hover {
-  color: #E8D5B7;
+  color: var(--secondary-color);
   transform: scale(1.2);
-  filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.6));
 }
 
 .shop-now-btn {
-  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-  color: #000000;
+  background: var(--primary-color);
+  color: #FFFFFF;
   border: none;
-  padding: 0.8rem 2rem;
-  border-radius: 50px;
-  font-size: 1rem;
-  font-weight: 700;
+  padding: 0.75rem 1.8rem;
+  border-radius: 30px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+  box-shadow: 0 2px 8px rgba(244, 166, 184, 0.25);
   position: relative;
   overflow: hidden;
 }
@@ -122,7 +123,23 @@
 
 .shop-now-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 25px rgba(255, 215, 0, 0.5);
+  box-shadow: 0 4px 12px rgba(244, 166, 184, 0.35);
+  background: var(--secondary-color);
+}
+
+.logout-btn {
+  background: transparent;
+  border: 1px solid var(--accent-color);
+  color: var(--accent-color);
+  padding: 0.5rem 1rem;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.logout-btn:hover {
+  background: var(--accent-color);
+  color: #FFFFFF;
 }
 
 /* Mobile menu toggle */
@@ -138,7 +155,7 @@
 /* Responsive Design */
 @media (max-width: 1200px) {
   .header {
-    padding: 1rem 3%;
+    padding: 0.2rem 3%;
   }
   
   .main-nav ul {
@@ -152,11 +169,11 @@
 
 @media (max-width: 968px) {
   .header {
-    padding: 1rem 2%;
+    padding: 0.2rem 2%;
   }
   
   .logo {
-    height: 70px;
+    height: 50px;
   }
   
   .main-nav ul {
@@ -184,7 +201,7 @@
   }
   
   .logo {
-    height: 60px;
+    height: 50px;
   }
   
   .main-nav {
