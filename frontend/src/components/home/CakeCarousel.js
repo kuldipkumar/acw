@@ -5,6 +5,7 @@ import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import './CakeCarousel.css';
 import { NextArrow, PrevArrow } from './CustomArrows';
+import ImageModal from '../ImageModal';
 
 const CakeCarousel = () => {
   const [cakes, setCakes] = React.useState([]);
@@ -100,6 +101,18 @@ const CakeCarousel = () => {
     return <section className="carousel-section"><p>Error loading cakes: {error}</p></section>;
   }
 
+  const handleNext = () => {
+    const currentIndex = cakes.findIndex(c => c.id === selectedCake.id);
+    const nextIndex = (currentIndex + 1) % cakes.length;
+    setSelectedCake(cakes[nextIndex]);
+  };
+
+  const handlePrev = () => {
+    const currentIndex = cakes.findIndex(c => c.id === selectedCake.id);
+    const prevIndex = (currentIndex - 1 + cakes.length) % cakes.length;
+    setSelectedCake(cakes[prevIndex]);
+  };
+
   return (
     <section className="carousel-section">
       <div className="carousel-container">
@@ -129,24 +142,14 @@ const CakeCarousel = () => {
         <NavLink to="/gallery" className="view-all-btn">View All Creations</NavLink>
       </div>
       
-      {/* Modal for selected cake */}
+      {/* Modal for selected cake - using same component as gallery */}
       {selectedCake && (
-        <div className="carousel-modal-overlay" onClick={() => setSelectedCake(null)}>
-          <div className="carousel-modal-content" onClick={e => e.stopPropagation()}>
-            <button className="carousel-modal-close" onClick={() => setSelectedCake(null)}>×</button>
-            <img src={selectedCake.src} alt={selectedCake.alt} className="carousel-modal-image" />
-            <div className="carousel-modal-info">
-              <h2>{selectedCake.name}</h2>
-              {selectedCake.tags && selectedCake.tags.length > 0 && (
-                <div className="carousel-modal-tags">
-                  {selectedCake.tags.map(tag => (
-                    <span key={tag} className="carousel-modal-tag">#{tag}</span>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
+        <ImageModal 
+          cake={selectedCake} 
+          onClose={() => setSelectedCake(null)} 
+          onNext={handleNext} 
+          onPrev={handlePrev} 
+        />
       )}
     </section>
   );

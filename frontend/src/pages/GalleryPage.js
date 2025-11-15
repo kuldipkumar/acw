@@ -116,7 +116,6 @@ const GalleryPage = ({ isAdminMode = false }) => {
             <div className="gallery-image-container" onClick={() => setSelectedCake(cake)}>
               <img src={cake.src} alt={cake.alt} className="gallery-image" />
               <div className="gallery-overlay">
-                <h3 className="gallery-cake-name">{cake.name}</h3>
                 {cake.tags && cake.tags.length > 0 && (
                   <div className="gallery-tags">
                     {cake.tags.map(tag => <span key={tag} className="gallery-tag">#{tag}</span>)}
@@ -124,6 +123,7 @@ const GalleryPage = ({ isAdminMode = false }) => {
                 )}
               </div>
             </div>
+            <h3 className="gallery-cake-name">{cake.name}</h3>
             {(authToken || isAdminMode) && (
               <button className="edit-btn" onClick={(e) => { e.stopPropagation(); setEditingCake(cake); }}>
                 Edit
