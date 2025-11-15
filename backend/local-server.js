@@ -158,7 +158,7 @@ app.post('/api/upload', authenticateToken, upload.single('image'), async (req, r
     });
 
     // Extract metadata from body - matches Lambda destructuring
-    const { title, description, category, tags } = req.body;
+    const { title, description, category, tags, isLandingImage, showInCarousel } = req.body;
 
     const fileExtension = path.extname(req.file.originalname).toLowerCase();
     const key = `${uuidv4()}${fileExtension}`;
@@ -170,6 +170,8 @@ app.post('/api/upload', authenticateToken, upload.single('image'), async (req, r
       category: category || '',
       tags: tags || '',
       originalname: req.file.originalname, // Note: S3 metadata keys are lowercased
+      islandingimage: String(isLandingImage === 'true' || isLandingImage === true),
+      showincarousel: String(showInCarousel === 'true' || showInCarousel === true),
     };
 
     const params = {
@@ -302,6 +304,7 @@ app.get('/api/cakes', async (req, res) => {
           lastModified: item.LastModified,
           size: item.Size,
           isLandingImage: metadata.islandingimage === 'true',
+          showInCarousel: metadata.showincarousel === 'true',
         };
       } catch (error) {
         console.error(`Error processing ${item.Key}:`, error);
@@ -318,6 +321,8 @@ app.get('/api/cakes', async (req, res) => {
           src: signedUrl,
           lastModified: item.LastModified,
           size: item.Size,
+          isLandingImage: false,
+          showInCarousel: false,
         };
       }
     }));
@@ -340,7 +345,7 @@ app.put('/api/cakes/:id', authenticateToken, async (req, res) => {
       });
     }
 
-    const { title, description, category, tags, isLandingImage } = req.body;
+    const { title, description, category, tags, isLandingImage, showInCarousel } = req.body;
 
     // First, get the existing metadata to preserve fields not being updated
     const headParams = {
@@ -393,6 +398,7 @@ app.put('/api/cakes/:id', authenticateToken, async (req, res) => {
       category: category !== undefined ? category : existingMetadata.category || '',
       tags: tags !== undefined ? (Array.isArray(tags) ? tags.join(',') : tags) : existingMetadata.tags || '',
       islandingimage: isLandingImage !== undefined ? String(isLandingImage) : existingMetadata.islandingimage || 'false',
+      showincarousel: showInCarousel !== undefined ? String(showInCarousel) : existingMetadata.showincarousel || 'false',
     };
 
     // Copy the object to update its metadata

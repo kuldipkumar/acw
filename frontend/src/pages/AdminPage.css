@@ -100,6 +100,33 @@
   opacity: 0.6;
 }
 
+.checkbox-group {
+  flex-direction: row;
+  align-items: center;
+  gap: 0;
+}
+
+.checkbox-group label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  text-transform: none;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.checkbox-group input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: var(--primary-color);
+}
+
+.checkbox-group span {
+  color: var(--text-color);
+}
+
 .upload-button {
   background-color: var(--primary-color);
   color: white;

@@ -27,7 +27,30 @@ const CakeCarousel = () => {
         console.log('API Response:', result); // Log the variable, not the function call
         // The body from a REST API Lambda proxy is often a string, so we need to parse it again.
         const data = typeof result.body === 'string' ? JSON.parse(result.body) : result;
-        setCakes(data);
+        
+        console.log('=== CAROUSEL DEBUG ===');
+        console.log('Total images fetched:', data.length);
+        console.log('First 3 images showInCarousel values:', data.slice(0, 3).map(c => ({
+          name: c.name,
+          showInCarousel: c.showInCarousel,
+          type: typeof c.showInCarousel
+        })));
+        
+        // Filter to show only images marked for carousel, limit to 10
+        // Temporary: if showInCarousel is undefined (old images), include them
+        const carouselCakes = data
+          .filter(cake => {
+            const shouldShow = cake.showInCarousel === true || cake.showInCarousel === undefined;
+            if (shouldShow) {
+              console.log('✓ Including in carousel:', cake.name, '(showInCarousel:', cake.showInCarousel, ')');
+            }
+            return shouldShow;
+          })
+          .slice(0, 10);
+        
+        console.log(`Filtered ${carouselCakes.length} carousel cakes from ${data.length} total`);
+        console.log('=== END CAROUSEL DEBUG ===');
+        setCakes(carouselCakes);
       } catch (e) {
         console.error('Failed to fetch cakes:', e);
         setError(e.message || 'Failed to fetch');
@@ -126,7 +149,12 @@ const CakeCarousel = () => {
                   onDoubleClick={() => setSelectedCake(cake)}
                   style={{ cursor: 'pointer' }}
                 >
-                  <img src={cake.src} alt={cake.alt} className="cake-image" />
+                  <img 
+                    src={cake.src} 
+                    alt={cake.alt} 
+                    className="cake-image"
+                    loading="lazy"
+                  />
                   <div className="cake-info">
                     <h3 className="cake-name">{cake.name}</h3>
                   </div>

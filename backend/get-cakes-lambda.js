@@ -46,6 +46,10 @@ exports.handler = async (event) => {
         
         console.log(`Metadata for ${item.Key}:`, metadata);
         
+        // Generate thumbnail URL by appending query parameter hint
+        // Note: This doesn't actually resize on S3, but frontend can use it to identify thumbnail requests
+        const thumbnailUrl = `${url}&thumb=true`;
+        
         return {
           id: item.Key,
           name: metadata.title || item.Key.split('.')[0].replace(/[-_]/g, ' '),
@@ -54,11 +58,13 @@ exports.handler = async (event) => {
           tags: metadata.tags ? metadata.tags.split(',').map(tag => tag.trim()) : [],
           originalname: metadata.originalname || item.Key,
           alt: `Image of ${metadata.title || item.Key}`,
-          src: url,
+          src: url, // Full size image
+          thumbnailUrl: thumbnailUrl, // Thumbnail hint (same URL for now)
           url: url,
           lastModified: item.LastModified,
           size: item.Size,
           isLandingImage: metadata.islandingimage === 'true',
+          showInCarousel: metadata.showincarousel === 'true',
         };
       } catch (error) {
         console.error(`Error processing ${item.Key}:`, error);
@@ -77,6 +83,7 @@ exports.handler = async (event) => {
           lastModified: item.LastModified,
           size: item.Size,
           isLandingImage: false,
+          showInCarousel: false,
         };
       }
     });

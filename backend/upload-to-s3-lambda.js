@@ -82,8 +82,8 @@ exports.handler = async (event) => {
     });
 
     // Extract metadata from the form fields
-    const { title, description, category, tags } = result;
-    console.log('Extracted metadata:', { title, description, category, tags });
+    const { title, description, category, tags, isLandingImage, showInCarousel } = result;
+    console.log('Extracted metadata:', { title, description, category, tags, isLandingImage, showInCarousel });
 
     // Generate a unique filename
     const fileExt = path.extname(file.filename).toLowerCase();
@@ -97,6 +97,8 @@ exports.handler = async (event) => {
       category: category || '',
       tags: tags || '',
       originalname: file.filename, // Note: S3 metadata keys are lowercased
+      islandingimage: String(isLandingImage === 'true' || isLandingImage === true),
+      showincarousel: String(showInCarousel === 'true' || showInCarousel === true),
     };
     console.log('S3 metadata prepared:', s3Metadata);
 

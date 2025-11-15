@@ -16,7 +16,9 @@ const AdminPage = () => {
   const [uploadStatus, setUploadStatus] = useState('');
   const [metadata, setMetadata] = useState({
     title: '',
-    tags: ''
+    tags: '',
+    isLandingImage: false,
+    showInCarousel: false
   });
 
   // Check for existing auth token on mount
@@ -69,10 +71,10 @@ const AdminPage = () => {
   };
 
   const handleMetadataChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
     setMetadata(prev => ({
       ...prev,
-      [name]: value
+      [name]: type === 'checkbox' ? checked : value
     }));
   };
 
@@ -112,7 +114,9 @@ const AdminPage = () => {
       setSelectedFile(null);
       setMetadata({
         title: '',
-        tags: ''
+        tags: '',
+        isLandingImage: false,
+        showInCarousel: false
       });
       document.getElementById('file-upload').value = '';
     } catch (error) {
@@ -196,6 +200,28 @@ const AdminPage = () => {
                 placeholder="e.g., birthday, chocolate, wedding"
                 required
               />
+            </div>
+            <div className="form-group checkbox-group">
+              <label>
+                <input
+                  type="checkbox"
+                  name="isLandingImage"
+                  checked={metadata.isLandingImage}
+                  onChange={handleMetadataChange}
+                />
+                <span>Set as Landing Page Hero Image</span>
+              </label>
+            </div>
+            <div className="form-group checkbox-group">
+              <label>
+                <input
+                  type="checkbox"
+                  name="showInCarousel"
+                  checked={metadata.showInCarousel}
+                  onChange={handleMetadataChange}
+                />
+                <span>Show in Carousel (Homepage)</span>
+              </label>
             </div>
             <button type="submit" className="upload-button" disabled={isUploading}>
               {isUploading ? 'Uploading...' : 'Upload'}

@@ -7,6 +7,7 @@ const EditImageModal = ({ image, onClose, onSave }) => {
   const [category, setCategory] = useState('');
   const [tags, setTags] = useState('');
   const [isLandingImage, setIsLandingImage] = useState(false);
+  const [showInCarousel, setShowInCarousel] = useState(false);
 
   useEffect(() => {
     if (image) {
@@ -15,6 +16,7 @@ const EditImageModal = ({ image, onClose, onSave }) => {
       setCategory(image.category || '');
       setTags(Array.isArray(image.tags) ? image.tags.join(', ') : '');
       setIsLandingImage(image.isLandingImage || false);
+      setShowInCarousel(image.showInCarousel || false);
     }
   }, [image]);
 
@@ -26,7 +28,8 @@ const EditImageModal = ({ image, onClose, onSave }) => {
       description, 
       category, 
       tags: tags.split(',').map(t => t.trim()),
-      isLandingImage 
+      isLandingImage,
+      showInCarousel
     });
   };
 
@@ -50,7 +53,17 @@ const EditImageModal = ({ image, onClose, onSave }) => {
               checked={isLandingImage} 
               onChange={(e) => setIsLandingImage(e.target.checked)} 
             />
-            <span>Set as Landing Page Image</span>
+            <span>Set as Landing Page Hero Image</span>
+          </label>
+        </div>
+        <div className="landing-image-toggle">
+          <label>
+            <input 
+              type="checkbox" 
+              checked={showInCarousel} 
+              onChange={(e) => setShowInCarousel(e.target.checked)} 
+            />
+            <span>Show in Carousel (Homepage)</span>
           </label>
         </div>
         <div className="modal-actions">

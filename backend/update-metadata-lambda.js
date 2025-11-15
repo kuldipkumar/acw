@@ -19,7 +19,7 @@ exports.handler = async (event) => {
 
   try {
     const imageId = event.pathParameters.id;
-    const { title, description, category, tags, isLandingImage } = JSON.parse(event.body);
+    const { title, description, category, tags, isLandingImage, showInCarousel } = JSON.parse(event.body);
 
     // If setting this image as landing image, unset all other images first
     if (isLandingImage === true) {
@@ -69,6 +69,7 @@ exports.handler = async (event) => {
       category: category || existingMetadata.category || '',
       tags: tags ? (Array.isArray(tags) ? tags.join(',') : tags) : existingMetadata.tags || '',
       islandingimage: isLandingImage !== undefined ? String(isLandingImage) : existingMetadata.islandingimage || 'false',
+      showincarousel: showInCarousel !== undefined ? String(showInCarousel) : existingMetadata.showincarousel || 'false',
     };
 
     const copyCommand = new CopyObjectCommand({
