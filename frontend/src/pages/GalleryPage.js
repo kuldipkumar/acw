@@ -6,13 +6,16 @@ import './GalleryPage.css';
 const GalleryPage = ({ isAdminMode = false }) => {
   const [cakes, setCakes] = useState([]);
   const [filteredCakes, setFilteredCakes] = useState([]);
+  const [displayedCakes, setDisplayedCakes] = useState([]);
   const [activeFilter, setActiveFilter] = useState('All');
   const [allTags, setAllTags] = useState(['All']);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-    const [selectedCake, setSelectedCake] = useState(null);
-    const [editingCake, setEditingCake] = useState(null);
-      const [authToken] = useState(localStorage.getItem('adminToken'));
+  const [selectedCake, setSelectedCake] = useState(null);
+  const [editingCake, setEditingCake] = useState(null);
+  const [authToken] = useState(localStorage.getItem('adminToken'));
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 20;
 
   
   useEffect(() => {
@@ -48,7 +51,22 @@ const GalleryPage = ({ isAdminMode = false }) => {
       const filtered = cakes.filter(cake => cake.tags && cake.tags.includes(activeFilter));
       setFilteredCakes(filtered);
     }
+    setCurrentPage(1); // Reset to first page when filter changes
   }, [activeFilter, cakes]);
+
+  // Pagination effect
+  useEffect(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    const end = start + ITEMS_PER_PAGE;
+    setDisplayedCakes(filteredCakes.slice(start, end));
+  }, [currentPage, filteredCakes, ITEMS_PER_PAGE]);
+
+  const totalPages = Math.ceil(filteredCakes.length / ITEMS_PER_PAGE);
+
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   const handleSave = async (id, updatedData) => {
     try {
@@ -107,14 +125,19 @@ const GalleryPage = ({ isAdminMode = false }) => {
       </div>
       
       <div className="gallery-stats">
-        <p>Showing {filteredCakes.length} of {cakes.length} cakes</p>
+        <p>Showing {displayedCakes.length} of {filteredCakes.length} cakes (Page {currentPage} of {totalPages})</p>
       </div>
       
       <div className="gallery-grid">
-        {filteredCakes.map(cake => (
+        {displayedCakes.map(cake => (
           <div key={cake.id} className="gallery-item">
             <div className="gallery-image-container" onClick={() => setSelectedCake(cake)}>
-              <img src={cake.src} alt={cake.alt} className="gallery-image" />
+              <img 
+                src={cake.src} 
+                alt={cake.alt} 
+                className="gallery-image"
+                loading="lazy"
+              />
               <div className="gallery-overlay">
                 {cake.tags && cake.tags.length > 0 && (
                   <div className="gallery-tags">
@@ -138,8 +161,39 @@ const GalleryPage = ({ isAdminMode = false }) => {
           <p>No cakes found for "{activeFilter}". Try a different filter!</p>
         </div>
       )}
+
+      {/* Pagination Controls */}
+      {totalPages > 1 && (
+        <div className="pagination">
+          <button 
+            className="pagination-btn" 
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+          >
+            ← Previous
+          </button>
+          <div className="pagination-info">
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+              <button
+                key={page}
+                className={`pagination-number ${currentPage === page ? 'active' : ''}`}
+                onClick={() => handlePageChange(page)}
+              >
+                {page}
+              </button>
+            ))}
+          </div>
+          <button 
+            className="pagination-btn" 
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+          >
+            Next →
+          </button>
+        </div>
+      )}
       
-            {selectedCake && (
+      {selectedCake && (
         <ImageModal 
           cake={selectedCake} 
           onClose={() => setSelectedCake(null)} 
